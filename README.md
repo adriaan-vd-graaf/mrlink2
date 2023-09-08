@@ -132,7 +132,7 @@ The summary statistics files should at have the following columns, which are mos
 'n_iids' # the number of individuals available for the SNP effect estimate
 ```
 
-### Understanding the output of MR-link 2
+## Understanding the output of MR-link 2
 MR-link 2 is a likelihood function that estimates 3 parameters, and tests 2 of these.
 The main parameter of interest is alpha, which represents the causal effect. 
 Then, MR-link 2 also simulates a parameter that measures vertical pleiotropy we call sigma_y, this parameter can be 
