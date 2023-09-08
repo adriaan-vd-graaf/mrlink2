@@ -1004,7 +1004,7 @@ def mr_link2_on_region(region: StartEndRegion,
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(prog="MR-link 2",
+    parser = argparse.ArgumentParser(
                                      description="""                                    
                 MR-link 2: 
                 
@@ -1014,7 +1014,7 @@ Pleiotropy robust cis Mendelian randomization
                                      )
     parser.add_argument('--reference_bed',
                         required=True,
-                        help='The plink bed file prepend of the genotype file that can be used as an LD reference.'
+                        help='The plink bed file prepend of the genotype file that can be used as an LD reference. '
                              'Usage is the same as in the plink --bed command')
     parser.add_argument('--sumstats_exposure',
                         required=True,
@@ -1036,7 +1036,7 @@ Pleiotropy robust cis Mendelian randomization
 
     parser.add_argument('--p_threshold',
                         default=5e-8,
-                        help='The P value threshold for which select regions. This is the same as the clumping p value'
+                        help='The P value threshold for which select regions. This is the same as the clumping P value'
                              ' threshold'
                         )
     parser.add_argument('--region_padding',
@@ -1067,13 +1067,13 @@ Pleiotropy robust cis Mendelian randomization
                         default =[0.99] ,
                         type=float,
                         help='This field specifies the amount of variance explained of the LD matrix that is used by MR'
-                             '-link 2. You can add onto this field, and all variances explained will be added:'
+                             '-link 2. You can add onto this field, and all variances explained will be added: '
                              '--var_explained_grid 0.99 0.999 0.2 0.96 0.1 will perform an MR-link 2 estimate for '
                              'all these values.')
 
     parser.add_argument('--continue_analysis',
                         action='store_true',
-                        help='Flag to continue an already started analysis, if specified this will look for a temporary'
+                        help='Flag to continue an already started analysis, if specified this will look for a temporary '
                              'file, and if it present, reuse its results. This can be handy if you have hundreds of '
                              'associated regions, which can sometimes take a long time to run.')
 
@@ -1084,7 +1084,7 @@ Pleiotropy robust cis Mendelian randomization
 
     parser.add_argument('--verbose',
                         default=0,
-                        help='Set to 1 if you want to read more output, for debugging purposes')
+                        help='Set to 1 if you want to read more output, for debugging purposes ')
 
     args = parser.parse_args()
 
