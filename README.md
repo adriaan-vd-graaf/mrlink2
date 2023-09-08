@@ -140,9 +140,9 @@ related to the amount of vertical pleiotropy present in a locus.
 Finally, MR-link 2 estimates a parameter sigma_x that represents the amount of heritability there is for the exposure.
 
 An MR-link 2 output file will contain the following columns and an explanation:
-#### region
+##### region
 The region that was used for the MR-link 2 inference
-#### var_explained
+##### var_explained
 The amount of variance that was kept from the correlation matrix used to correct for LD
 
 #### alpha
