@@ -1004,23 +1004,87 @@ def mr_link2_on_region(region: StartEndRegion,
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--reference_bed', required=True)
-    parser.add_argument('--sumstats_exposure', required=True)
-    parser.add_argument('--sumstats_outcome', required=True)
-    parser.add_argument('--out', required=True)
+    parser = argparse.ArgumentParser(prog="MR-link 2",
+                                     description="""                                    
+                MR-link 2: 
+                
+Pleiotropy robust cis Mendelian randomization
 
-    parser.add_argument('--p_threshold', default=5e-8)
-    parser.add_argument('--region_padding', default=5e5)
-    parser.add_argument('--maf_threshold', default=0.005)
-    parser.add_argument('--max_correlation', default=0.99)
-    parser.add_argument('--max_missingness', default=0.95, )
-    parser.add_argument('--var_explained_grid',  nargs='+', default =[0.99] , type=float)
+""",
+                                     )
+    parser.add_argument('--reference_bed',
+                        required=True,
+                        help='The plink bed file prepend of the genotype file that can be used as an LD reference.'
+                             'Usage is the same as in the plink --bed command')
+    parser.add_argument('--sumstats_exposure',
+                        required=True,
+                        help='The summary statistics file of the exposure file. Please see the README file or the\n'
+                             'example_files folder for examples on how to make these files.')
+    parser.add_argument('--sumstats_outcome',
+                        required=True,
+                        help='The summary statistics file of the outcome file. Please see the README file or the\n'
+                             'example_files folder for examples on how to make these files.'
+                        )
+    parser.add_argument('--out',
+                        required=True,
+                        help='The path where to output results'
+                        )
 
-    parser.add_argument('--continue_analysis', action='store_true')
+    parser.add_argument('--tmp',
+                        default='tmp_',
+                        help='a prepend on where to save temporary files')
 
-    parser.add_argument('--tmp', default='tmp_devel_')
-    parser.add_argument('--verbose', default=0)
+    parser.add_argument('--p_threshold',
+                        default=5e-8,
+                        help='The P value threshold for which select regions. This is the same as the clumping p value'
+                             ' threshold'
+                        )
+    parser.add_argument('--region_padding',
+                        default=5e5,
+                        help='The base pair padding (on one side) on each clumped SNP which defines the region in which '
+                             'MR-link 2 will perform its inference'
+                        )
+    parser.add_argument('--maf_threshold',
+                        default=0.005,
+                        help='The minor allele frequency threshold used for clumping, and for calculating the LD matrix.'
+                             'This will not be applied to the summary statistics files'
+                             )
+    parser.add_argument('--max_correlation',
+                        default=0.99,
+                        help='The maximum correlation allowed in the LD matrix, if the correlation is higher than this '
+                              'value between a pair of SNPs, will only keep one of them. This value is used to reduce '
+                              'eigenvalue decomposition failures'
+                        )
+
+    parser.add_argument('--max_missingness',
+                        default=0.95,
+                        help= 'This is the maximum amount of individual missingness that is allowed in a summary statistic '
+                              'MR-link 2 can be sensitive to large differences in summary statistic missingness, so '
+                              'by default each SNP association should have at least 0.95 of observations available.')
+
+    parser.add_argument('--var_explained_grid',
+                        nargs='+',
+                        default =[0.99] ,
+                        type=float,
+                        help='This field specifies the amount of variance explained of the LD matrix that is used by MR'
+                             '-link 2. You can add onto this field, and all variances explained will be added:'
+                             '--var_explained_grid 0.99 0.999 0.2 0.96 0.1 will perform an MR-link 2 estimate for '
+                             'all these values.')
+
+    parser.add_argument('--continue_analysis',
+                        action='store_true',
+                        help='Flag to continue an already started analysis, if specified this will look for a temporary'
+                             'file, and if it present, reuse its results. This can be handy if you have hundreds of '
+                             'associated regions, which can sometimes take a long time to run.')
+
+    parser.add_argument('--no_normalize_sumstats',
+                        action='store_true',
+                        help='flag to _not_ normalize summary statistics')
+
+
+    parser.add_argument('--verbose',
+                        default=0,
+                        help='Set to 1 if you want to read more output, for debugging purposes')
 
     args = parser.parse_args()
 
@@ -1054,7 +1118,9 @@ if __name__ == '__main__':
                                    'beta',  'se', 'z', 'pval',  'n_iids'}
 
     print(f'Performing sumstats file preprocessing')
-
+    """
+    Exposure summary statistics loading and parsing
+    """
     tmp_exposure_sumstats_file = f'{tmp_prepend}_exposure_sumstats.txt'
     files_to_remove.add(tmp_exposure_sumstats_file)
 
@@ -1068,10 +1134,20 @@ if __name__ == '__main__':
     if verbosity:
         print(f'before missingness filter: {exposure_df.shape=}')
     exposure_df = exposure_df[exposure_df.n_iids >= (max_missingness * exposure_df.n_iids.max())]
+
+    if not args.no_normalize_sumstats:
+        exposure_df['beta'] = exposure_df.z / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
+        exposure_df['se'] = 1 / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
+
     exposure_df.to_csv(tmp_exposure_sumstats_file, sep='\t', index=False)
     if verbosity:
         print(f'after missingness filter: {exposure_df.shape=}')
 
+
+
+    """
+    Outcome summary statistics loading and parsing
+    """
     outcome_df = pd.read_csv(sumstats_outcome, sep='\t')
     if len(set(outcome_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
         raise ValueError('Outcome summary statistics do not contain the necessary columns.\n'
@@ -1080,6 +1156,11 @@ if __name__ == '__main__':
     if verbosity:
         print(f'before missingness filter: {outcome_df.shape=}')
     outcome_df = outcome_df[outcome_df.n_iids >= (max_missingness * outcome_df.n_iids.max())]
+
+    if not args.no_normalize_sumstats:
+        exposure_df['beta'] = exposure_df.z / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
+        exposure_df['se'] = 1 / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
+
     if verbosity:
         print(f'after missingness filter: {outcome_df.shape=}')
 
