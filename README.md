@@ -6,7 +6,7 @@ genotype reference file.
 
 Please keep an eye on this space for our paper where we validate MR-link 2 on an extensive set of validation datasets.
 The main benefit of MR-link 2 is that it has lower false positive rates than other _cis_ MR methods, while retaining
-similar or better bdiscriminative ability.
+similar or better discriminative ability.
 
 Disclaimer: MR-link 2 is still under development, so it can be subject to change.
 
