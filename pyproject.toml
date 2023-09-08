@@ -1,0 +1,23 @@
+[project]
+name = "mrlink_2"
+version = "0.0.1"
+description = "MR-link 2"
+authors = [
+  { name = "Adriaan van der Graaf" },
+]
+license = { file = "LICENSE" }
+readme = "README.md"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: MacOS, Linux",
+]
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "scipy",
+    "pandas"
+]
+
+#[project.urls]
+#"Homepage" = "https://github.com/pypa/sampleproject"
