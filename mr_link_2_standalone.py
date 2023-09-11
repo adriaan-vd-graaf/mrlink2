@@ -995,7 +995,7 @@ def mr_link2_on_region(region: StartEndRegion,
                                    'sigma_x', 'function_time', ]]
 
     ## this is a normalization step that is done as the likelihood function computes them per SNP
-    mr_results_df['sigma_x'] = mr_results_df['sigma_x'] / mr_results_df['m_snps_overlap']
+    mr_results_df['sigma_x'] = mr_results_df['sigma_x'] * mr_results_df['m_snps_overlap']
 
     mr_results_df['sigma_y'] = mr_results_df['sigma_y'] * mr_results_df['m_snps_overlap']
     mr_results_df['se(sigma_y)'] = mr_results_df['se(sigma_y)'] * mr_results_df['m_snps_overlap']

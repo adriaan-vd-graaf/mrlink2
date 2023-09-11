@@ -51,14 +51,14 @@ After running these two commands (takes about 2 seconds each), they will output 
 ```
 # causal effect
 region                  var_explained   m_snps_overlap   alpha                   se(alpha)               p(alpha)                sigma_y                 se(sigma_y)             p(sigma_y)              sigma_x                 function_time
-2:101532661-103480976	0.99	        1131	         0.5283473429025785	     0.059209065938272826	 4.521077372682387e-19	 0.186462435522639	     0.007506026260614542	 3.179330642667223e-136	 5.302475414178811e-07	 0.09963393211364746
+2:101532661-103480976	0.99	        1131	         0.5283473429025785	     0.059209065938272826	 4.521077372682387e-19	 0.186462435522639	     0.007506026260614542	 3.179330642667223e-136	 0.6782719753276382	     0.09963393211364746
 ```
 In the above line we see that the causal effect `alpha` is 0.52, with a _P_ value of 4.5x10^-19. The `sigma_y` 
 estimate is large (0.18), but very significant (P: 3.1x10^-136). Indicating a causal effect, as well as a pleiotropic effect.  
 ```
 # non causal effect
 region                  var_explained   m_snps_overlap   alpha                   se(alpha)               p(alpha)                sigma_y                 se(sigma_y)             p(sigma_y)              sigma_x                 function_time
-2:101515908-103411057	0.99	        1131	         -0.007902079145919932	 0.05244589259853782	 0.880235189575116	     0.1666326648242604	     0.006713831609782223	 5.5482348469902104e-136 4.7601146803521096e-07	 0.07275605201721191
+2:101515908-103411057	0.99	        1131	         -0.007902079145919932	 0.05244589259853782	 0.880235189575116	     0.1666326648242604	     0.006713831609782223	 5.5482348469902104e-136 0.6088953054633884 	 0.07275605201721191
 ```
 In the following example, line we see that the causal effect `alpha` is close to zero, with a _P_ value of 0.88. The `sigma_y` 
 estimate again is large (0.16), but very significant (P: 5.5x10^-136). This indicates that the locus is very pleiotropic.
