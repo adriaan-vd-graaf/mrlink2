@@ -145,7 +145,7 @@ The region that was used for the MR-link 2 inference
 ##### var_explained
 The amount of variance that was kept from the correlation matrix used to correct for LD
 ##### m_snps_overlap
-The number of SNPs in the region on which the estimate was beased.
+The number of SNPs in the region on which the estimate was based.
 
 
 ##### alpha
