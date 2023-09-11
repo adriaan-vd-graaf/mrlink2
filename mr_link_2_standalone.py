@@ -989,10 +989,16 @@ def mr_link2_on_region(region: StartEndRegion,
     mr_results_df['region'] = str(region)
     mr_results_df['m_snps_overlap'] = m_snps
 
-    mr_results_df = mr_results_df[['region', 'var_explained',
+    mr_results_df = mr_results_df[['region', 'var_explained', 'm_snps_overlap',
                                     'alpha', 'se(alpha)', 'p(alpha)',
                                    'sigma_y', 'se(sigma_y)', 'p(sigma_y)',
-                                   'sigma_x', 'function_time',]]
+                                   'sigma_x', 'function_time', ]]
+
+    ## this is a normalization step that is done as the likelihood function computes them per SNP
+    mr_results_df['sigma_x'] = mr_results_df['sigma_x'] / mr_results_df['m_snps_overlap']
+
+    mr_results_df['sigma_y'] = mr_results_df['sigma_y'] * mr_results_df['m_snps_overlap']
+    mr_results_df['se(sigma_y)'] = mr_results_df['se(sigma_y)'] * mr_results_df['m_snps_overlap']
 
     ## clean up
     for filename in files_to_remove:
