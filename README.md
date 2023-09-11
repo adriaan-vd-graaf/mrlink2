@@ -145,20 +145,20 @@ The region that was used for the MR-link 2 inference
 ##### var_explained
 The amount of variance that was kept from the correlation matrix used to correct for LD
 
-#### alpha
+##### alpha
 The point estimate of alpha, the causal effect
-#### se(alpha)       
+##### se(alpha)       
 The standard error of the point estimate of alpha, the standard error of the causal effect
-#### p(alpha)        
+##### p(alpha)        
 The p value of the point estimate of alpha
-#### sigma_y 
+##### sigma_y 
 The point estimate of sigma_y, the amount of pleiotropic variance there is in the region (per SNP in the region)
-#### se(sigma_y)     
+##### se(sigma_y)     
 The standard error of the point estimate of sigma_y, the amount of pleiotropic variance there is in the region
-#### p(sigma_y)      
+##### p(sigma_y)      
 The p value of the presence of pleiotropic effect.
-#### sigma_x 
+##### sigma_x 
 The point estimate of the exposure heritability (per SNP in the region)
-#### function_time
+##### function_time
 The time it took to run the MR-link 2 estimate. This does not include preprocessing time, which can be substantial
 
