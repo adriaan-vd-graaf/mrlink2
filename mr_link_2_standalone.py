@@ -293,15 +293,29 @@ def identify_regions(sumstats_exposure: str,
 
     if not os.path.exists(f'{plink_tmp_prepend}_clumping_results.clumped'):
         return None
-    clumped_snps = pd.read_csv(f'{plink_tmp_prepend}_clumping_results.clumped', sep='\s+')
+
+
+
 
     all_regions = []
-    for i, row in clumped_snps.iterrows():
-        data = [str(row.CHR), int(int(row.BP) - padding if int(row.BP) - padding > 0 else 0), int(row.BP) + padding]
-        all_regions.append(
-            StartEndRegion(data)
-        )
-    all_regions = sorted(all_regions)
+    try:
+        with open(f'{plink_tmp_prepend}_clumping_results.clumped') as f:
+            f.readline() # header
+            for line in f:
+                if line in {'', '\n'}:
+                    continue
+                split = line.split()
+                chromosome = split[0]
+                position = split[3]
+                data = [str(chromosome), int(int(position) - padding if int(position) - padding > 0 else 0), int(position) + padding]
+                all_regions.append(
+                    StartEndRegion(data)
+                )
+        all_regions = sorted(all_regions)
+
+    except Exception as x:
+        raise ValueError(f'Couldn\'t parse the clumped file with error {x}')
+
 
     combined_regions = StartEndRegions(all_regions).make_non_overlapping_regions()
 
