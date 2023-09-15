@@ -297,7 +297,7 @@ def identify_regions(sumstats_exposure: str,
 
     all_regions = []
     for i, row in clumped_snps.iterrows():
-        data = [str(row.CHR), int(row.BP - padding if row.BP - padding > 0 else 0), int(row.BP + padding)]
+        data = [str(row.CHR), int(int(row.BP) - padding if int(row.BP) - padding > 0 else 0), int(row.BP) + padding]
         all_regions.append(
             StartEndRegion(data)
         )

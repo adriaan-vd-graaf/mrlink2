@@ -61,7 +61,7 @@ region                  var_explained   m_snps_overlap   alpha                  
 2:101515908-103411057	0.99	        1131	         -0.007902079145919932	 0.05244589259853782	 0.880235189575116	     0.1666326648242604	     0.006713831609782223	 5.5482348469902104e-136 0.6088953054633884 	 0.07275605201721191
 ```
 In the following example, line we see that the causal effect `alpha` is close to zero, with a _P_ value of 0.88. The `sigma_y` 
-estimate again is large (0.16), but very significant (P: 5.5x10^-136). This indicates that the locus is very pleiotropic.
+estimate again is large (0.16) and very significant (P: 5.5x10^-136). This indicates that the locus is very pleiotropic.
 
 Nb. results may be slightly different in your version, which may be due to the stochastic nature of the methods' inference, and 
 or differences in software versions.
