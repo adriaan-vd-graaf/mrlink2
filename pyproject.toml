@@ -9,7 +9,7 @@ license = { file = "LICENSE" }
 readme = "README.md"
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "License :: Copyright Adriaan van der Graaf 2023",
     "Operating System :: MacOS, Linux",
 ]
 requires-python = ">=3.9"
