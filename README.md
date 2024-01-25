@@ -6,6 +6,8 @@ genotype reference file.  We have validated this method in 3 different real-worl
 
 Please find details of our validations and more information of the method in our [preprint](https://www.medrxiv.org/content/10.1101/2024.01.22.24301400v1).
 
+If you have any questions or suggestions, feel free to open an issue.
+We appreciate everybody trying to use our software, so we try to come back to you as soon as possible!  
 
 ### Requirements
 MR-link-2 has been tested on macOS X and Linux combined with Python 3.9, 3.10 and 3.11. 
@@ -160,3 +162,24 @@ The point estimate of the exposure heritability in the region
 ##### function_time
 The time it took to run the MR-link-2 estimate. This does not include preprocessing time, which can be substantial
 
+## Frequently asked questions 
+
+### I need to input harmonized summary statistics, what does this mean?
+How to correctly harmonize a study depends on what you're studying. 
+For the analysis in our original publication, we performed the folllowing steps:
+
+```
+We processed summary statistics of all studies in the same way: 
+First, if necessary, we lifted over summary statistics into human chromosome build 37 using UCSCs liftover tool (https://genome.ucsc.edu/cgi-bin/hgLiftOver) combined with their chain files (https://hgdownload.soe.ucsc.edu/downloads.html). 
+Then, we include SNP variants that have LD information available, by overlapping the variants (based on chromosome, position and alleles) present in the summary statistics file with the variants in our LD reference (UK10k). Due to potential strand inconsistencies, palindromic SNPs were removed. 
+Genetic associations are retained if they have at least a minor allele frequency of 0.5% in the UK10K LD reference and if the variant has been measured in at least 95% of the maximum number of measured individuals (if the information was available).
+```
+
+It is not necessary to remove palindromic SNPs from your cohort if you're confident that they are measured on the correct strand. 
+As we were using publicly available data, we didn't want to make that assumption, as it can be detrimental to the MR-link 2 analysis.  
+
+### Why are the effect sizes different from my other MR analysis?
+To retain statistical stability, we perform a normalization step of the effect sizes. This normalization step changes the units of the genetic associations into 'variance explained' units. 
+If summary statistics information is in another unit, this will result in changes of the eventual causal effect estimate compared to more classical MR analysis. 
+
+If you _really_ do not want this normalization to happen, you can use the `--no_normalize_sumstats` option. Please be careful when doing this though, as the MR-link 2 results here have not been tested, and we provide no guarantees.
