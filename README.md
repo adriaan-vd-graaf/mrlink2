@@ -114,7 +114,7 @@ options:
 MR-link-2 requires 2 summary statistics files that are formatted the same and a genotype file in the plink 
 .bed/.bim/.fam format
 
-The summary statistics files should at have the following columns, which are mostly self explanatory.
+The summary statistics files should be a tab ('\t') separated file at have the following columns, which are mostly self explanatory.
 
 ```
 'pos_name', # SNP names of the variants (must match those of the plink bed file) 
