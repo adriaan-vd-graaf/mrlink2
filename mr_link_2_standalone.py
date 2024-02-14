@@ -935,7 +935,7 @@ def mr_link2_on_region(region: StartEndRegion,
 
     exposure_instruments = select_instruments_by_clumping(exp_pvals,
                                                           correlation_mat,
-                                                          clumping_p_threshold=5-6,
+                                                          clumping_p_threshold=5e-6,
                                                           r_threshold=0.1) # r is pearson
     pseudo_instrument_exp_h2 = np.sum(exp_betas[exposure_instruments] ** 2 - (1 / n_exp))
 
