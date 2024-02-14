@@ -107,7 +107,11 @@ options:
   --continue_analysis   Flag to continue an already started analysis, if specified this will look for a temporary file, and if it present, reuse its results. This can be handy if you have hundreds of associated regions, which can sometimes take a long time to run.
   --no_normalize_sumstats
                         flag to _not_ normalize summary statistics
-  --verbose VERBOSE     Set to 1 if you want to read more output, for debugging purposes
+  --no_exclude_hla      
+                        flag to _not_ exclude the HLA. Please don't use this flag unless you absolutely know what you're doing.
+                        The HLA has very long range LD that can interfere with MR-link 2.                  
+  --verbose VERBOSE     
+                        Set to 1 if you want to read more output, for debugging purposes
 ```
 
 ## The input files for MR-link-2
