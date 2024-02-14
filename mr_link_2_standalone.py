@@ -1101,6 +1101,10 @@ Pleiotropy robust cis Mendelian randomization
                         action='store_true',
                         help='flag to _not_ normalize summary statistics')
 
+    parser.add_argument('--no_exclude_hla',
+                        action='store_true',
+                        help='flag to _not_ exclude the HLA region.')
+
 
     parser.add_argument('--verbose',
                         default=0,
@@ -1209,8 +1213,11 @@ Pleiotropy robust cis Mendelian randomization
             f.write('\n')
         exit()
 
-    hla_region = StartEndRegion('6:25000000-37000000')
-    regions_to_do = [StartEndRegion(x) for x in regions_to_do if StartEndRegion(x) not in hla_region]
+    if not args.no_exclude_hla:
+        hla_region = StartEndRegion('6:25000000-37000000')
+        regions_to_do = [StartEndRegion(x) for x in regions_to_do if StartEndRegion(x) not in hla_region]
+    else:
+        regions_to_do = [StartEndRegion(x) for x in regions_to_do]
 
     print(f'Finished identifying {len(regions_to_do)} regions, now continueing with MR-link2 for each region')
 
