@@ -108,8 +108,9 @@ options:
   --no_normalize_sumstats
                         flag to _not_ normalize summary statistics
   --no_exclude_hla      
-                        flag to _not_ exclude the HLA. Please don't use this flag unless you absolutely know what you're doing.
-                        The HLA has very long range LD that can interfere with MR-link 2.                  
+                        flag to _not_ exclude the HLA.
+                        Please don't use this flag unless you absolutely know what you're doing.
+                        The HLA has very long range LD that can interfere with inference of MR-link 2.                  
   --verbose VERBOSE     
                         Set to 1 if you want to read more output, for debugging purposes
 ```
