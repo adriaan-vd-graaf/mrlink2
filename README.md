@@ -4,7 +4,7 @@ MR-link-2 is a _cis_ MR method that is pleiotropy robust.
 Inference with MR-link-2 requires **pre-harmonized** summary statistics of an exposure and an outcome, and a 
 genotype reference file.  We have validated this method in 3 different real-world datasets of causality. 
 
-Please find details of our validations and more information of the method in our [preprint](https://www.medrxiv.org/content/10.1101/2024.01.22.24301400v1).
+Please find details of our validations and more information on the method in our [preprint](https://www.medrxiv.org/content/10.1101/2024.01.22.24301400v1).
 
 If you have any questions or suggestions, feel free to open an issue.
 We appreciate everybody trying to use our software, so we try to come back to you as soon as possible!  
