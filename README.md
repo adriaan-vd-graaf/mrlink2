@@ -171,7 +171,7 @@ The time it took to run the MR-link-2 estimate. This does not include preprocess
 
 ### I need to input harmonized summary statistics, what does this mean?
 How to correctly harmonize a study depends on what you're studying. 
-For the analysis in our original publication, we performed the folllowing steps:
+For the analysis in our original publication, we performed the following steps:
 
 ```
 We processed summary statistics of all studies in the same way: 
