@@ -187,4 +187,4 @@ As we were using publicly available data, we didn't want to make that assumption
 To retain statistical stability, we perform a normalization step of the effect sizes. This normalization step changes the units of the genetic associations into 'variance explained' units. 
 If summary statistics information is in another unit, this will result in changes of the eventual causal effect estimate compared to more classical MR analysis. 
 
-If you _really_ do not want this normalization to happen, you can use the `--no_normalize_sumstats` option. Please be careful when doing this though, as the MR-link 2 results here have not been tested, and we provide no guarantees.
+If you _really_ do not want this normalization to happen, you can use the `--no_normalize_sumstats` option. Please be careful when doing this though, as the MR-link 2 results here have not been tested, and we provide no guarantees on the accuracy of the estimates.
