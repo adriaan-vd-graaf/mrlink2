@@ -11,6 +11,9 @@ import copy
 import scipy
 import scipy.io
 from typing import Any, Tuple, Dict
+import tempfile
+
+
 
 class StartEndRegion:
     """
@@ -1052,7 +1055,7 @@ Pleiotropy robust cis Mendelian randomization
 
     parser.add_argument('--tmp',
                         default='tmp_',
-                        help='a prepend on where to save temporary files')
+                        help='a prepend on where to save temporary files DEPRECATED')
 
     parser.add_argument('--p_threshold',
                         default=5e-8,
@@ -1133,162 +1136,163 @@ Pleiotropy robust cis Mendelian randomization
             raise ValueError('All var explained values should be in the [0.0, 1.0] interval')
 
     # housekeeping params
-    tmp_prepend = args.tmp
     verbosity = args.verbose
     files_to_remove = set()
 
-    # This is some preprocessing of the summary statistic files to make sure that we filter for at least 95% sample size
-    sumstats_necessary_colnames = {'pos_name',  'chromosome', 'position', 'effect_allele', 'reference_allele',
-                                   'beta',  'se', 'z', 'pval',  'n_iids'}
+    with tempfile.TemporaryDirectory() as tmp_prepend:
+        tmp_dir = f'{tmp_prepend}/tmp_'
+        # This is some preprocessing of the summary statistic files to make sure that we filter for at least 95% sample size
+        sumstats_necessary_colnames = {'pos_name',  'chromosome', 'position', 'effect_allele', 'reference_allele',
+                                       'beta',  'se', 'z', 'pval',  'n_iids'}
 
-    print(f'Performing sumstats file preprocessing')
-    """
-    Exposure summary statistics loading and parsing
-    """
-    tmp_exposure_sumstats_file = f'{tmp_prepend}_exposure_sumstats.txt'
-    files_to_remove.add(tmp_exposure_sumstats_file)
+        print(f'Performing sumstats file preprocessing')
+        """
+        Exposure summary statistics loading and parsing
+        """
+        tmp_exposure_sumstats_file = f'{tmp_dir}_exposure_sumstats.txt'
+        files_to_remove.add(tmp_exposure_sumstats_file)
 
-    exposure_df = pd.read_csv(sumstats_exposure, sep='\t')
-    if len(set(exposure_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
-        raise ValueError('Exposure summary statistics do not contain the necessary columns.\n'
-                         f'The following columns should at least be present:\n{sumstats_necessary_colnames}\n'
-                         f'The following columns are present: {exposure_df.columns}')
-
-
-    if verbosity:
-        print(f'before missingness filter: {exposure_df.shape=}')
-    exposure_df = exposure_df[exposure_df.n_iids >= (max_missingness * exposure_df.n_iids.max())]
-
-    if not args.no_normalize_sumstats:
-        exposure_df['beta'] = exposure_df.z / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
-        exposure_df['se'] = 1 / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
-
-    exposure_df.to_csv(tmp_exposure_sumstats_file, sep='\t', index=False)
-    if verbosity:
-        print(f'after missingness filter: {exposure_df.shape=}')
+        exposure_df = pd.read_csv(sumstats_exposure, sep='\t')
+        if len(set(exposure_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
+            raise ValueError('Exposure summary statistics do not contain the necessary columns.\n'
+                             f'The following columns should at least be present:\n{sumstats_necessary_colnames}\n'
+                             f'The following columns are present: {exposure_df.columns}')
 
 
+        if verbosity:
+            print(f'before missingness filter: {exposure_df.shape=}')
+        exposure_df = exposure_df[exposure_df.n_iids >= (max_missingness * exposure_df.n_iids.max())]
 
-    """
-    Outcome summary statistics loading and parsing
-    """
-    outcome_df = pd.read_csv(sumstats_outcome, sep='\t')
-    if len(set(outcome_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
-        raise ValueError('Outcome summary statistics do not contain the necessary columns.\n'
-                         f'The following columns should at least be present:\n{sumstats_necessary_colnames}\n'
-                         f'The following columns are present: {outcome_df.columns}')
-    if verbosity:
-        print(f'before missingness filter: {outcome_df.shape=}')
-    outcome_df = outcome_df[outcome_df.n_iids >= (max_missingness * outcome_df.n_iids.max())]
+        if not args.no_normalize_sumstats:
+            exposure_df['beta'] = exposure_df.z / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
+            exposure_df['se'] = 1 / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
 
-    if not args.no_normalize_sumstats:
-        exposure_df['beta'] = exposure_df.z / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
-        exposure_df['se'] = 1 / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
+        exposure_df.to_csv(tmp_exposure_sumstats_file, sep='\t', index=False)
+        if verbosity:
+            print(f'after missingness filter: {exposure_df.shape=}')
 
-    if verbosity:
-        print(f'after missingness filter: {outcome_df.shape=}')
 
-    print('Starting to identify regions')
-    exposure_regions = identify_regions(tmp_exposure_sumstats_file,
-                                        reference_bed,
-                                        p_threshold,
-                                        maf_threshold,
-                                        region_padding,
-                                        tmp_prepend,
-                                        verbosity_level=verbosity)
 
-    if exposure_regions is None:
-        print(f'Did not find any regions for {sumstats_exposure}, at p < {p_threshold:.2e}')
-        # write to an empty file
-        with open(args.out + "_noregions", 'w') as f:
-            f.write('\n')
-        exit()
+        """
+        Outcome summary statistics loading and parsing
+        """
+        outcome_df = pd.read_csv(sumstats_outcome, sep='\t')
+        if len(set(outcome_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
+            raise ValueError('Outcome summary statistics do not contain the necessary columns.\n'
+                             f'The following columns should at least be present:\n{sumstats_necessary_colnames}\n'
+                             f'The following columns are present: {outcome_df.columns}')
+        if verbosity:
+            print(f'before missingness filter: {outcome_df.shape=}')
+        outcome_df = outcome_df[outcome_df.n_iids >= (max_missingness * outcome_df.n_iids.max())]
 
-    regions_to_do = StartEndRegions(exposure_regions)
+        if not args.no_normalize_sumstats:
+            exposure_df['beta'] = exposure_df.z / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
+            exposure_df['se'] = 1 / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
 
-    if len(regions_to_do.gene_regions) == 0:
-        print(f'Did not find any regions for {sumstats_exposure}, at p < {p_threshold:.2e}')
-        # write to an empty file
-        with open(args.out + "_no_overlap", 'w') as f:
-            f.write('\n')
-        exit()
+        if verbosity:
+            print(f'after missingness filter: {outcome_df.shape=}')
 
-    if not args.no_exclude_hla:
-        hla_region = StartEndRegion('6:25000000-37000000')
-        regions_to_do = [StartEndRegion(x) for x in regions_to_do if StartEndRegion(x) not in hla_region]
-    else:
-        regions_to_do = [StartEndRegion(x) for x in regions_to_do]
+        print('Starting to identify regions')
+        exposure_regions = identify_regions(tmp_exposure_sumstats_file,
+                                            reference_bed,
+                                            p_threshold,
+                                            maf_threshold,
+                                            region_padding,
+                                            tmp_dir,
+                                            verbosity_level=verbosity)
 
-    print(f'Finished identifying {len(regions_to_do)} regions, now continueing with MR-link2 for each region')
+        if exposure_regions is None:
+            print(f'Did not find any regions for {sumstats_exposure}, at p < {p_threshold:.2e}')
+            # write to an empty file
+            with open(args.out + "_noregions", 'w') as f:
+                f.write('\n')
+            exit()
 
-    if verbosity:
-        print(exposure_df.head())
+        regions_to_do = StartEndRegions(exposure_regions)
 
-    if verbosity:
-        print(outcome_df.head())
+        if len(regions_to_do.gene_regions) == 0:
+            print(f'Did not find any regions for {sumstats_exposure}, at p < {p_threshold:.2e}')
+            # write to an empty file
+            with open(args.out + "_no_overlap", 'w') as f:
+                f.write('\n')
+            exit()
 
-    all_results = []
-    regions_already_done = []
-    previously_done_df = pd.DataFrame()
+        if not args.no_exclude_hla:
+            hla_region = StartEndRegion('6:25000000-37000000')
+            regions_to_do = [StartEndRegion(x) for x in regions_to_do if StartEndRegion(x) not in hla_region]
+        else:
+            regions_to_do = [StartEndRegion(x) for x in regions_to_do]
 
-    combined_df = None
+        print(f'Finished identifying {len(regions_to_do)} regions, now continueing with MR-link2 for each region')
 
-    if args.continue_analysis:
-        if os.path.exists(args.out + '_tmp'):
-            previously_done_df = pd.read_csv(args.out + '_tmp', sep='\t')
-            regions_already_done = set(previously_done_df.region.unique())
+        if verbosity:
+            print(exposure_df.head())
 
-        elif os.path.exists(args.out):
-            previously_done_df = pd.read_csv(args.out, sep='\t')
-            regions_already_done = set(previously_done_df.region.unique())
+        if verbosity:
+            print(outcome_df.head())
 
-        all_results.append(previously_done_df)
-        combined_df = pd.concat(all_results)
+        all_results = []
+        regions_already_done = []
+        previously_done_df = pd.DataFrame()
 
-    exceptions = []
-    for region in regions_to_do:
-        regional_results = None
-        if str(region) in regions_already_done:
-            print(f'Already done {region}, continueing with the next one')
-            continue
+        combined_df = None
 
-        try:
-            regional_results = mr_link2_on_region(region,
-                                                  exposure_df,
-                                                  outcome_df,
-                                                  reference_bed,
-                                                  maf_threshold,
-                                                  max_correlation,
-                                                  tmp_prepend=tmp_prepend,
-                                                  verbosity=verbosity,
-                                                  var_explained_grid=var_explained_grid)
-        except Exception as x:
-            exceptions.append((region, x))
-            print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
-            continue
+        if args.continue_analysis:
+            if os.path.exists(args.out + '_tmp'):
+                previously_done_df = pd.read_csv(args.out + '_tmp', sep='\t')
+                regions_already_done = set(previously_done_df.region.unique())
 
-        if regional_results is None:
-            exceptions.append((region, 'NONE_RESULT'))
-            print('Unable to identify mr-link2 results in {region} region')
-            continue
+            elif os.path.exists(args.out):
+                previously_done_df = pd.read_csv(args.out, sep='\t')
+                regions_already_done = set(previously_done_df.region.unique())
 
-        all_results.append(regional_results)
-        combined_df = pd.concat(all_results)
-        combined_df.to_csv(args.out + '_tmp', sep='\t', index=False)
+            all_results.append(previously_done_df)
+            combined_df = pd.concat(all_results)
 
-    # write results
-    if len(all_results) != 0 and combined_df is not None:
-        combined_df.to_csv(args.out, sep='\t', index=False)
-        if os.path.exists(args.out + '_tmp'):
-            os.remove(args.out + '_tmp')
+        exceptions = []
+        for region in regions_to_do:
+            regional_results = None
+            if str(region) in regions_already_done:
+                print(f'Already done {region}, continueing with the next one')
+                continue
 
-    # write exceptions to a file
-    if len(exceptions) != 0:
-        with open(args.out + '_no_estimate', 'a') as f:
-            for region, exception in exceptions:
-                f.write(f'{region}\t{exception}\n')
+            try:
+                regional_results = mr_link2_on_region(region,
+                                                      exposure_df,
+                                                      outcome_df,
+                                                      reference_bed,
+                                                      maf_threshold,
+                                                      max_correlation,
+                                                      tmp_prepend=tmp_dir,
+                                                      verbosity=verbosity,
+                                                      var_explained_grid=var_explained_grid)
+            except Exception as x:
+                exceptions.append((region, x))
+                print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
+                continue
 
-    # finally, clean up
-    for filename in files_to_remove:
-        if os.path.exists(filename):
-            os.remove(filename)
+            if regional_results is None:
+                exceptions.append((region, 'NONE_RESULT'))
+                print('Unable to identify mr-link2 results in {region} region')
+                continue
+
+            all_results.append(regional_results)
+            combined_df = pd.concat(all_results)
+            combined_df.to_csv(args.out + '_tmp', sep='\t', index=False)
+
+        # write results
+        if len(all_results) != 0 and combined_df is not None:
+            combined_df.to_csv(args.out, sep='\t', index=False)
+            if os.path.exists(args.out + '_tmp'):
+                os.remove(args.out + '_tmp')
+
+        # write exceptions to a file
+        if len(exceptions) != 0:
+            with open(args.out + '_no_estimate', 'a') as f:
+                for region, exception in exceptions:
+                    f.write(f'{region}\t{exception}\n')
+
+        # finally, clean up
+        for filename in files_to_remove:
+            if os.path.exists(filename):
+                os.remove(filename)
