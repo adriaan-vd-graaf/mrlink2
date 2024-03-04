@@ -129,7 +129,7 @@ The summary statistics files should be a tab ('\t') separated file at have the f
 'reference_allele', # The reference allele of the summary statistics
 'beta',  # The effect size of the SNP onto the trait
 'se', # The standard error of the effect size of the SNP onto the trait
-'z', # The Z score of the effect of the SNP on the trait
+'z', # The Z score of the effect of the SNP on the trait, if you don't have this, you can calculate it using the formula "z = beta / se" 
 'pval', # The p values of the SNP 
 'n_iids' # the number of individuals available for the SNP effect estimate
 ```
