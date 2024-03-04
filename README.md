@@ -91,7 +91,7 @@ options:
   --sumstats_outcome SUMSTATS_OUTCOME
                         The summary statistics file of the outcome file. Please see the README file or the example_files folder for examples on how to make these files.
   --out OUT             The path where to output results
-  --tmp TMP             a prepend on where to save temporary files
+  --tmp TMP             Not necessary anymore: a prepend on where to save temporary files DEPRECATED
   --p_threshold P_THRESHOLD
                         The P value threshold for which select regions. This is the same as the clumping P value threshold
   --region_padding REGION_PADDING
