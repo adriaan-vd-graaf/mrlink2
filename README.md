@@ -167,6 +167,14 @@ The point estimate of the exposure heritability in the region
 ##### function_time
 The time it took to run the MR-link-2 estimate. This does not include preprocessing time, which can be substantial
 
+
+### _no_estimate files
+The no_estimate files will be written when something went wrong in the MR-link 2 function. This is usually caused by incorrectly harmonized summary statistics.
+Please don't hesitate to contact us if you have questions about a specific analysis. 
+
+### _no_region files
+The `_no_region` files will be written when, after matching the SNPs within the two summary statistics files, there is no exposure genetic association available at the  `--p_threshold` instrument selection threshold.
+
 ## Frequently asked questions 
 
 ### I need to input harmonized summary statistics, what does this mean?
