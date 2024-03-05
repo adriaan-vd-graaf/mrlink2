@@ -141,15 +141,14 @@ Then, MR-link-2 also simulates a parameter that measures horizontal pleiotropy w
 related to the amount of vertical pleiotropy present in a locus.
 Finally, MR-link-2 estimates a parameter sigma_x that represents the amount of heritability there is for the exposure.
 
-An MR-link-2 output file will contain the following columns and an explanation:
+### results files
+After a succesful estimate, MR-link-2 output files contain the following columns and an explanation:
 ##### region
 The region that was used for the MR-link-2 inference
 ##### var_explained
 The amount of variance that was kept from the correlation matrix used to correct for LD
 ##### m_snps_overlap
 The number of SNPs in the region on which the estimate was based.
-
-
 ##### alpha
 The point estimate of alpha, the causal effect
 ##### se(alpha)       
