@@ -14,7 +14,6 @@ from typing import Any, Tuple, Dict
 import tempfile
 
 
-
 class StartEndRegion:
     """
     Class that implements a genomic region, which is really a stretch of base pairs.
@@ -297,20 +296,18 @@ def identify_regions(sumstats_exposure: str,
     if not os.path.exists(f'{plink_tmp_prepend}_clumping_results.clumped'):
         return None
 
-
-
-
     all_regions = []
     try:
         with open(f'{plink_tmp_prepend}_clumping_results.clumped') as f:
-            f.readline() # header
+            f.readline()  # header
             for line in f:
                 if line in {'', '\n'}:
                     continue
                 split = line.split()
                 chromosome = split[0]
                 position = split[3]
-                data = [str(chromosome), int(int(position) - padding if int(position) - padding > 0 else 0), int(position) + padding]
+                data = [str(chromosome), int(int(position) - padding if int(position) - padding > 0 else 0),
+                        int(position) + padding]
                 all_regions.append(
                     StartEndRegion(data)
                 )
@@ -318,7 +315,6 @@ def identify_regions(sumstats_exposure: str,
 
     except Exception as x:
         raise ValueError(f'Couldn\'t parse the clumped file with error {x}')
-
 
     combined_regions = StartEndRegions(all_regions).make_non_overlapping_regions()
 
@@ -675,7 +671,7 @@ def mr_link2(selected_eigenvalues: np.ndarray, selected_eigenvectors: np.ndarray
     ## Now take the likelihoods and start doing the likelihood ratio test
     alpha = ha_results.x[0]
     alpha_chi_sq = 2 * (
-                alpha_h0_results.fun - ha_results.fun)  ## This is the likelihood ratio, because they are in log scale
+            alpha_h0_results.fun - ha_results.fun)  ## This is the likelihood ratio, because they are in log scale
     alpha_p_val = scipy.stats.chi2.sf(alpha_chi_sq, 1)  ## This is
     z_alpha = 0.0 if alpha_chi_sq <= 0 else np.sign(alpha) * np.sqrt(alpha_chi_sq)
     se_alpha = alpha / z_alpha if z_alpha != 0 else np.nan
@@ -745,7 +741,6 @@ def match_n_variants_n_individuals_from_plink_log(plink_logfile: str) -> Tuple[i
     :return: tuple
         Tuple containing the numbeer of variants and number of individuals
     """
-
 
     regex = re.compile('^([0-9]+) variants and ([0-9]+) people pass filters and QC\.')
     with open(plink_logfile) as f:
@@ -930,7 +925,6 @@ def mr_link2_on_region(region: StartEndRegion,
     n_exp = int(np.median(regional_exp_df.n_iids))
     n_out = int(np.median(regional_out_df.n_iids))
 
-
     print('     Starting MR-link2')
 
     pseudo_exp_h2 = np.sum(exp_betas ** 2 - (1 / n_exp))
@@ -939,13 +933,13 @@ def mr_link2_on_region(region: StartEndRegion,
     exposure_instruments = select_instruments_by_clumping(exp_pvals,
                                                           correlation_mat,
                                                           clumping_p_threshold=5e-6,
-                                                          r_threshold=0.1) # r is pearson
+                                                          r_threshold=0.1)  # r is pearson
     pseudo_instrument_exp_h2 = np.sum(exp_betas[exposure_instruments] ** 2 - (1 / n_exp))
 
     outcome_instruments = select_instruments_by_clumping(out_pvals,
                                                          correlation_mat,
                                                          clumping_p_threshold=5e-6,
-                                                         r_threshold=0.1) # r is pearson
+                                                         r_threshold=0.1)  # r is pearson
     pseudo_instrument_out_h2 = np.sum(exp_betas[outcome_instruments] ** 2 - (1 / n_exp))
 
     if np.isclose(pseudo_instrument_out_h2, 0.0):
@@ -968,7 +962,6 @@ def mr_link2_on_region(region: StartEndRegion,
         print(lam[:10:-1])
         print(f'original u  {u.shape}')
         print(u[:10:-1, :10:-1])
-
 
     # var_explained_grid = np.arange(0.7, 1.0, 0.01)
     results_list = []
@@ -1007,7 +1000,7 @@ def mr_link2_on_region(region: StartEndRegion,
     mr_results_df['m_snps_overlap'] = m_snps
 
     mr_results_df = mr_results_df[['region', 'var_explained', 'm_snps_overlap',
-                                    'alpha', 'se(alpha)', 'p(alpha)',
+                                   'alpha', 'se(alpha)', 'p(alpha)',
                                    'sigma_y', 'se(sigma_y)', 'p(sigma_y)',
                                    'sigma_x', 'function_time', ]]
 
@@ -1028,13 +1021,13 @@ def mr_link2_on_region(region: StartEndRegion,
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
-                                     description="""                                    
+        description="""                                    
                 MR-link 2: 
-                
+
 Pleiotropy robust cis Mendelian randomization
 
 """,
-                                     )
+    )
     parser.add_argument('--reference_bed',
                         required=True,
                         help='The plink bed file prepend of the genotype file that can be used as an LD reference. '
@@ -1071,23 +1064,23 @@ Pleiotropy robust cis Mendelian randomization
                         default=0.005,
                         help='The minor allele frequency threshold used for clumping, and for calculating the LD matrix.'
                              'This will not be applied to the summary statistics files'
-                             )
+                        )
     parser.add_argument('--max_correlation',
                         default=0.99,
                         help='The maximum correlation allowed in the LD matrix, if the correlation is higher than this '
-                              'value between a pair of SNPs, will only keep one of them. This value is used to reduce '
-                              'eigenvalue decomposition failures'
+                             'value between a pair of SNPs, will only keep one of them. This value is used to reduce '
+                             'eigenvalue decomposition failures'
                         )
 
     parser.add_argument('--max_missingness',
                         default=0.95,
-                        help= 'This is the maximum amount of individual missingness that is allowed in a summary statistic '
-                              'MR-link 2 can be sensitive to large differences in summary statistic missingness, so '
-                              'by default each SNP association should have at least 0.95 of observations available.')
+                        help='This is the maximum amount of individual missingness that is allowed in a summary statistic '
+                             'MR-link 2 can be sensitive to large differences in summary statistic missingness, so '
+                             'by default each SNP association should have at least 0.95 of observations available.')
 
     parser.add_argument('--var_explained_grid',
                         nargs='+',
-                        default =[0.99] ,
+                        default=[0.99],
                         type=float,
                         help='This field specifies the amount of variance explained of the LD matrix that is used by MR'
                              '-link 2. You can add onto this field, and all variances explained will be added: '
@@ -1108,6 +1101,17 @@ Pleiotropy robust cis Mendelian randomization
                         action='store_true',
                         help='flag to _not_ exclude the HLA region.')
 
+    parser.add_argument('--prespecified_regions',
+                        required=False,
+                        help='Specify which regions to do. format is the following: '
+                             '`{chr_1}:{start_1}-{end_1},{chr_2}:{start_2}-{end_2}`. i.e. these are regions that are '
+                             'separated with the comma character.'
+                             'This step will skip the clumping step to identify regions, '
+                             'and will blindly perform MR on regions that may or may not be associated to the exposure.\n'
+                             'This feature has been included to allow investigators to identify associated regions in '
+                             'one discovery cohort, and assess the MR effect in a different cohort, this is done '
+                             'to remove winners curse.'
+                        )
 
     parser.add_argument('--verbose',
                         default=0,
@@ -1142,8 +1146,8 @@ Pleiotropy robust cis Mendelian randomization
     with tempfile.TemporaryDirectory() as tmp_prepend:
         tmp_dir = f'{tmp_prepend}/tmp_'
         # This is some preprocessing of the summary statistic files to make sure that we filter for at least 95% sample size
-        sumstats_necessary_colnames = {'pos_name',  'chromosome', 'position', 'effect_allele', 'reference_allele',
-                                       'beta',  'se', 'z', 'pval',  'n_iids'}
+        sumstats_necessary_colnames = {'pos_name', 'chromosome', 'position', 'effect_allele', 'reference_allele',
+                                       'beta', 'se', 'z', 'pval', 'n_iids'}
 
         print(f'Performing sumstats file preprocessing')
         """
@@ -1158,7 +1162,6 @@ Pleiotropy robust cis Mendelian randomization
                              f'The following columns should at least be present:\n{sumstats_necessary_colnames}\n'
                              f'The following columns are present: {exposure_df.columns}')
 
-
         if verbosity:
             print(f'before missingness filter: {exposure_df.shape=}')
         exposure_df = exposure_df[exposure_df.n_iids >= (max_missingness * exposure_df.n_iids.max())]
@@ -1170,8 +1173,6 @@ Pleiotropy robust cis Mendelian randomization
         exposure_df.to_csv(tmp_exposure_sumstats_file, sep='\t', index=False)
         if verbosity:
             print(f'after missingness filter: {exposure_df.shape=}')
-
-
 
         """
         Outcome summary statistics loading and parsing
@@ -1192,21 +1193,29 @@ Pleiotropy robust cis Mendelian randomization
         if verbosity:
             print(f'after missingness filter: {outcome_df.shape=}')
 
-        print('Starting to identify regions')
-        exposure_regions = identify_regions(tmp_exposure_sumstats_file,
-                                            reference_bed,
-                                            p_threshold,
-                                            maf_threshold,
-                                            region_padding,
-                                            tmp_dir,
-                                            verbosity_level=verbosity)
+        """
+        Perform clumping or use regions that were previously prespecified.
+        """
 
-        if exposure_regions is None:
-            print(f'Did not find any regions for {sumstats_exposure}, at p < {p_threshold:.2e}')
-            # write to an empty file
-            with open(args.out + "_noregions", 'w') as f:
-                f.write('\n')
-            exit()
+        if args.prespecified_regions is not None:
+            exposure_regions = [StartEndRegion(x) for x in args.prespecified_regions.split(',')]
+            print(f"The following regions have been prespecified: {exposure_regions}. Not doing clumping")
+        else:
+            print('Starting to identify regions through clumping')
+            exposure_regions = identify_regions(tmp_exposure_sumstats_file,
+                                                reference_bed,
+                                                p_threshold,
+                                                maf_threshold,
+                                                region_padding,
+                                                tmp_dir,
+                                                verbosity_level=verbosity)
+
+            if exposure_regions is None:
+                print(f'Did not find any regions for {sumstats_exposure}, at p < {p_threshold:.2e}')
+                # write to an empty file
+                with open(args.out + "_noregions", 'w') as f:
+                    f.write('\n')
+                exit()
 
         regions_to_do = StartEndRegions(exposure_regions)
 

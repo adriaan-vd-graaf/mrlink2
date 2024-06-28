@@ -105,6 +105,16 @@ options:
   --var_explained_grid VAR_EXPLAINED_GRID [VAR_EXPLAINED_GRID ...]
                         This field specifies the amount of variance explained of the LD matrix that is used by MR-link-2. You can add onto this field, and all variances explained will be added: --var_explained_grid 0.99 0.999 0.2 0.96 0.1 will perform an MR-link-2 estimate for all these values.
   --continue_analysis   Flag to continue an already started analysis, if specified this will look for a temporary file, and if it present, reuse its results. This can be handy if you have hundreds of associated regions, which can sometimes take a long time to run.
+  --prespecified_regions PRESPECIFIED_REGIONS
+                        Specify which regions to do. format is the following: 
+                        `{chr_1}:{start_1}-{end_1},{chr_2}:{start_2}-{end_2}`. 
+                        i.e. these are regions that are separated with the comma character.
+                        This step will skip the clumping step to identify regions, and will blindly perform MR on 
+                        regions that may or may not be associated to the exposure. 
+                        This feature has been included to allow investigators to identify associated regions
+                        in one discovery cohort, and assess the MR effect in a different cohort. 
+                        This is a scenario for instance to remove winners curse.
+
   --no_normalize_sumstats
                         flag to _not_ normalize summary statistics
   --no_exclude_hla      
