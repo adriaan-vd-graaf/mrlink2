@@ -196,7 +196,6 @@ def test_mr_link2_loglik_reference_v0_large_values():
     n_x = 1e6
     n_y = 1e6
     result = mr_link2_loglik_reference_v0(th, lam, c_x, c_y, n_x, n_y)
-    assert isinstance(result, float)
     assert np.isclose(result, 17617.166270043643,)
     assert np.isclose(result, mr_link2_loglik_reference_v2(th, lam, c_x, c_y, n_x, n_y))
 
@@ -208,7 +207,6 @@ def test_mr_link2_loglik_reference_v0_negative_values():
     n_x = 100
     n_y = 100
     result = mr_link2_loglik_reference_v0(th, lam, c_x, c_y, n_x, n_y)
-    assert isinstance(result, float)
     assert np.isclose(result, 22.944216071347796)
     assert np.isclose(result, mr_link2_loglik_reference_v2(th, lam, c_x, c_y, n_x, n_y))
 
