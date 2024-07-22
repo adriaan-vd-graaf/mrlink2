@@ -13,6 +13,7 @@ We appreciate everybody trying to use our software, so we try to come back to yo
 MR-link-2 has been tested on MacOS X and Linux combined with Python 3.9, 3.10 and 3.11. 
 Although not tested, every Python version from 3.6 onwards should work.    
 We require some (standard) python packages to be installed, these are: `numpy`, `scipy` and `pandas`.
+xf you want to ensure all the tests run, `pytest` is also necessary.
 If they haven't been installed, please install these using pip.
 In the command line (shell, terminal), type: 
 
