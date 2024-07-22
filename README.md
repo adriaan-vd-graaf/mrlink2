@@ -10,7 +10,7 @@ If you have any questions or suggestions, feel free to open an issue.
 We appreciate everybody trying to use our software, so we try to come back to you as soon as possible!  
 
 ### Requirements
-MR-link-2 has been tested on macOS X and Linux combined with Python 3.9, 3.10 and 3.11. 
+MR-link-2 has been tested on MacOS X and Linux combined with Python 3.9, 3.10 and 3.11. 
 Although not tested, every Python version from 3.6 onwards should work.    
 We require some (standard) python packages to be installed, these are: `numpy`, `scipy` and `pandas`.
 If they haven't been installed, please install these using pip.
@@ -61,6 +61,8 @@ region                  var_explained   m_snps_overlap   alpha                  
 ```
 In the following example, line we see that the causal effect `alpha` is close to zero, with a _P_ value of 0.88. The `sigma_y` 
 estimate again is large (0.16) and very significant (P: 5.5x10^-136). This indicates that the locus is very pleiotropic.
+
+Alternatively, you can use the `test_commands.sh` script to run a few tests, and have a look at their results.
 
 Nb. results may be slightly different in your version, which may be due to the stochastic nature of the methods' inference, and 
 or differences in software versions.
