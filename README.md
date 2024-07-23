@@ -18,12 +18,20 @@ If they haven't been installed, please install these using pip.
 In the command line (shell, terminal), type: 
 
 ```{bash}
-pip3 install numpy scipy pandas
+pip3 install numpy scipy pandas pytest
 ```
 On top of this, we require plink1.9 to be present in your PATH variable. 
 Check this by typing `which plink` in your  shell. 
 If this prints a path, you have plink installed in your path.
 
+##### Testing if everything works as expected
+This repository uses pytest to analyze results
+If you want to make sure that everything works as expected, please ensure you have pytest installed and run the 
+following command.
+```{bash}
+pytest tests/integration_tests_mr_link_2.py
+```
+For this you need to have everything installed from the requirements, including `pytest`
 
 ### Example
 If you want to test MR-link-2 we have two examples:
