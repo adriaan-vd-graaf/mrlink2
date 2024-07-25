@@ -363,7 +363,7 @@ def identify_regions(sumstats_exposure: str,
     This is a function that takes a summary_statistics file, and the location of a bed file
     and clumps the most associated variants using plink.
 
-    :param sumstats_exposure: pandas.DataFrame containing at least the columns pos_name, pval, where pos_name should
+    :param sumstats_exposure: pandas.DataFrame containing at least the columns rsid, pval, where .rsid should
                               match the variants in the bed file.
     :param bed_prepend: str containing the path prepend of plink genotype files in the .bed, .bim, .fam file
     :param plink_p_threshold: float the p value threshold used for clumping
@@ -386,8 +386,8 @@ def identify_regions(sumstats_exposure: str,
                     '--clump-p1', f'{plink_p_threshold:.2e}',
                     '--clump-r2', f'{r_sq_threshold}',
                     '--clump-kb', f'{padding / 1000}',
-                    '--clump-snp-field', 'pos_name',
-                    '--clump-field', 'pval',
+                    '--clump-snp-field', 'rsid',
+                    '--clump-field', 'p_value',
                     '--out', f'{plink_tmp_prepend}_clumping_results'
                     ], check=True, stderr=stderr, stdout=stdout)
     files_to_remove += [f'{plink_tmp_prepend}_clumping_results.{x}' for x in ['clumped', 'log', 'nosex']]
@@ -902,14 +902,14 @@ def mr_link2_on_region(region: StartEndRegion,
     ## Isolate regions of interest.
     regional_exp_df = exposure_df[
         (exposure_df.chromosome.astype(str) == region.chromosome) &
-        (exposure_df.position.astype(int) >= region.start) &
-        (exposure_df.position.astype(int) <= region.end)
+        (exposure_df.base_pair_location.astype(int) >= region.start) &
+        (exposure_df.base_pair_location.astype(int) <= region.end)
         ]
 
     regional_out_df = outcome_df[
         (outcome_df.chromosome.astype(str) == region.chromosome) &
-        (outcome_df.position >= region.start) &
-        (outcome_df.position <= region.end)
+        (outcome_df.base_pair_location >= region.start) &
+        (outcome_df.base_pair_location <= region.end)
         ]
     if verbosity:
         print(regional_exp_df.shape)
@@ -917,7 +917,7 @@ def mr_link2_on_region(region: StartEndRegion,
 
     ld_matrix_snp_names = {x[0] for x in snps_alleles_in_ld_matrix}
     ld_matrix_snp_to_allele_dict = {x[0]: (x[1], x[2]) for x in snps_alleles_in_ld_matrix}
-    shared_snps = set(regional_exp_df.pos_name.tolist()) & set(regional_out_df.pos_name.tolist()) & ld_matrix_snp_names
+    shared_snps = set(regional_exp_df.rsid.tolist()) & set(regional_out_df.rsid.tolist()) & ld_matrix_snp_names
 
     if verbosity:
         print(f'Found {len(shared_snps)} shared SNPS')
@@ -925,8 +925,8 @@ def mr_link2_on_region(region: StartEndRegion,
         print('Could not make an MR estimate due to no shared SNPs, returning None')
         return None
 
-    regional_exp_df = regional_exp_df[regional_exp_df.pos_name.isin(shared_snps)]
-    regional_out_df = regional_out_df[regional_out_df.pos_name.isin(shared_snps)]
+    regional_exp_df = regional_exp_df[regional_exp_df.rsid.isin(shared_snps)]
+    regional_out_df = regional_out_df[regional_out_df.rsid.isin(shared_snps)]
 
     ## make sure that the LD matrix contains only the shared SNPs.
     indexes_to_keep = np.asarray([i for i in range(len(snps_alleles_in_ld_matrix)) if snps_alleles_in_ld_matrix[i][0] in shared_snps], dtype=int)
@@ -935,33 +935,33 @@ def mr_link2_on_region(region: StartEndRegion,
 
     ## harmonize the betas, exposure is reference
     snp_to_beta_dict = {}
-    exp_dict = dict(zip(regional_exp_df['pos_name'],
+    exp_dict = dict(zip(regional_exp_df['rsid'],
                         zip(regional_exp_df['beta'],
                             regional_exp_df['effect_allele'],
-                            regional_exp_df['reference_allele'],
-                            regional_exp_df['pval'],
-                            regional_exp_df['se'])))
+                            regional_exp_df['other_allele'],
+                            regional_exp_df['p_value'],
+                            regional_exp_df['standard_error'])))
 
-    out_dict = dict(zip(regional_out_df['pos_name'],
+    out_dict = dict(zip(regional_out_df['rsid'],
                         zip(regional_out_df['beta'],
                             regional_out_df['effect_allele'],
-                            regional_out_df['reference_allele'],
-                            regional_out_df['pval'],
-                            regional_out_df['se'])))
+                            regional_out_df['other_allele'],
+                            regional_out_df['p_value'],
+                            regional_out_df['standard_error'])))
 
     """ 
     harmonize the summary statistics 
     to the LD reference alleles.  
     """
-    for pos_name in shared_snps:
+    for rsid in shared_snps:
         ## Use the LD matrix alleles as the underlying reference
-        ref_a1, ref_a2 = ld_matrix_snp_to_allele_dict[pos_name]
-        exp_beta, exp_a1, exp_a2, _, _ = exp_dict[pos_name]
-        out_beta, out_a1, out_a2, _, _ = out_dict[pos_name]
+        ref_a1, ref_a2 = ld_matrix_snp_to_allele_dict[rsid]
+        exp_beta, exp_a1, exp_a2, _, _ = exp_dict[rsid]
+        out_beta, out_a1, out_a2, _, _ = out_dict[rsid]
 
         # test if the alleles are the same, if not we should not continue
         if {exp_a1, exp_a2} != {ref_a1, ref_a2} or {out_a1, out_a2} != {ref_a1, ref_a2}:
-            raise ValueError(f'Harmonization error in snp {pos_name}, ld mat: {(ref_a1, ref_a2)}, exposure: {(exp_a1, out_a2)} outcome: {(out_a1, out_a2)}')
+            raise ValueError(f'Harmonization error in snp {rsid}, ld mat: {(ref_a1, ref_a2)}, exposure: {(exp_a1, out_a2)} outcome: {(out_a1, out_a2)}')
 
         # as we tested that the alelles are the same set, only have to look at alignment.
         if exp_a1 != ref_a1:
@@ -969,7 +969,7 @@ def mr_link2_on_region(region: StartEndRegion,
         if out_a1 != ref_a1:
             out_beta = -1 * out_beta
 
-        snp_to_beta_dict[pos_name] = [exp_beta, out_beta]
+        snp_to_beta_dict[rsid] = [exp_beta, out_beta]
 
     ## these should have been normalized. In my case they are.
     exp_betas = np.asarray([snp_to_beta_dict[x][0] for x in ordered_snps], dtype=float)
@@ -989,8 +989,8 @@ def mr_link2_on_region(region: StartEndRegion,
         raise ValueError(
             f'Too many SNPs in {region} region, after filtering, contains: {m_snps} snps > {max_snp_threshold}'
             'will take too long. Consider reducing the region size or pruning the correlation matrix more.')
-    n_exp = int(np.median(regional_exp_df.n_iids))
-    n_out = int(np.median(regional_out_df.n_iids))
+    n_exp = int(np.median(regional_exp_df.n))
+    n_out = int(np.median(regional_out_df.n))
 
     print('     Starting MR-link2')
 
@@ -1336,11 +1336,14 @@ Pleiotropy robust cis Mendelian randomization
 
     plink_geno_obj = PlinkGenoReader(reference_bed)
 
+    original_input_to_gwas_catalog_dict = {'pos_name': 'rsid', 'position': 'base_pair_location', 'reference_allele': 'other_allele',
+                                           'se':'standard_error', 'pval': 'p_value', 'n_iids': 'n'}
+
     with tempfile.TemporaryDirectory() as tmp_prepend:
         tmp_dir = f'{tmp_prepend}/tmp_'
         # This is some preprocessing of the summary statistic files to make sure that we filter for at least 95% sample size
-        sumstats_necessary_colnames = {'pos_name', 'chromosome', 'position', 'effect_allele', 'reference_allele',
-                                       'beta', 'se', 'z', 'pval', 'n_iids'}
+        sumstats_necessary_colnames = {'rsid', 'chromosome', 'base_pair_location','effect_allele', 'other_allele',
+                                       'beta', 'standard_error', 'p_value', 'n'}
 
         print(f'Performing sumstats file preprocessing')
         """
@@ -1350,6 +1353,7 @@ Pleiotropy robust cis Mendelian randomization
         files_to_remove.add(tmp_exposure_sumstats_file)
 
         exposure_df = pd.read_csv(sumstats_exposure, sep='\t')
+        exposure_df = exposure_df.rename(columns=original_input_to_gwas_catalog_dict)
         if len(set(exposure_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
             raise ValueError('Exposure summary statistics do not contain the necessary columns.\n'
                              f'The following columns should at least be present:\n{sumstats_necessary_colnames}\n'
@@ -1357,11 +1361,12 @@ Pleiotropy robust cis Mendelian randomization
 
         if verbosity:
             print(f'before missingness filter: {exposure_df.shape=}')
-        exposure_df = exposure_df[exposure_df.n_iids >= (max_missingness * exposure_df.n_iids.max())]
+        exposure_df = exposure_df[exposure_df.n >= (max_missingness * exposure_df.n.max())]
 
         if not args.no_normalize_sumstats:
-            exposure_df['beta'] = exposure_df.z / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
-            exposure_df['se'] = 1 / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
+            exposure_df['z'] = exposure_df['beta'] / exposure_df['standard_error']
+            exposure_df['beta'] = exposure_df.z / np.sqrt(exposure_df.n + exposure_df.z ** 2)
+            exposure_df['standard_error'] = 1 / np.sqrt(exposure_df.n + exposure_df.z ** 2)
 
         exposure_df.to_csv(tmp_exposure_sumstats_file, sep='\t', index=False)
         if verbosity:
@@ -1371,17 +1376,20 @@ Pleiotropy robust cis Mendelian randomization
         Outcome summary statistics loading and parsing
         """
         outcome_df = pd.read_csv(sumstats_outcome, sep='\t')
+        outcome_df = outcome_df.rename(columns=original_input_to_gwas_catalog_dict)
+
         if len(set(outcome_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
             raise ValueError('Outcome summary statistics do not contain the necessary columns.\n'
                              f'The following columns should at least be present:\n{sumstats_necessary_colnames}\n'
                              f'The following columns are present: {outcome_df.columns}')
         if verbosity:
             print(f'before missingness filter: {outcome_df.shape=}')
-        outcome_df = outcome_df[outcome_df.n_iids >= (max_missingness * outcome_df.n_iids.max())]
+        outcome_df = outcome_df[outcome_df.n >= (max_missingness * outcome_df.n.max())]
 
         if not args.no_normalize_sumstats:
-            exposure_df['beta'] = exposure_df.z / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
-            exposure_df['se'] = 1 / np.sqrt(exposure_df.n_iids + exposure_df.z ** 2)
+            outcome_df['z'] = outcome_df['beta'] / outcome_df['standard_error']
+            outcome_df['beta'] = outcome_df.z / np.sqrt(outcome_df.n + outcome_df.z ** 2)
+            outcome_df['standard_error'] = 1 / np.sqrt(outcome_df.n + outcome_df.z ** 2)
 
         if verbosity:
             print(f'after missingness filter: {outcome_df.shape=}')
@@ -1460,13 +1468,13 @@ Pleiotropy robust cis Mendelian randomization
 
             regional_exposure_df = exposure_df[
                 (exposure_df.chromosome.astype(str) == region.chromosome) &
-                (exposure_df.position.astype(int) >= region.start) &
-                (exposure_df.position.astype(int) <= region.end)
+                (exposure_df.base_pair_location.astype(int) >= region.start) &
+                (exposure_df.base_pair_location.astype(int) <= region.end)
                 ].copy()
 
 
             regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
-                                                                         regional_exposure_df.pos_name,
+                                                                         regional_exposure_df.rsid,
                                                                          maf_threshold=maf_threshold,
                                                                          max_correlation=max_correlation,
                                                                          )

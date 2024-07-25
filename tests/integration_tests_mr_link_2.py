@@ -30,11 +30,17 @@ I guess these are to ensure that no regressions happen
 
 def test_identification_of_regions_normal():
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    exposure_loc = os.path.join(current_dir, '../example_files/yes_causal_exposure.txt')
+    original_input_to_gwas_catalog_dict = {'pos_name': 'rsid', 'position': 'base_pair_location', 'reference_allele': 'other_allele',
+                                           'se':'standard_error', 'pval': 'p_value', 'n_iids': 'n'}
+    exposure_df = (pd.read_csv(os.path.join(current_dir, '../example_files/yes_causal_exposure.txt'), sep='\t')
+                   .rename(columns = original_input_to_gwas_catalog_dict))
+
     reference_bed = os.path.join(current_dir, '../example_files/reference_cohort')
 
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_dir = os.path.join(tmpdir, 'tmp_integration_testing_')
+        exposure_loc = os.path.join(tmp_dir + 'exposure_assocs_renamed.')
+        exposure_df.to_csv(exposure_loc, sep='\t', index=False)
 
         try:
             regions = identify_regions(exposure_loc,
@@ -51,6 +57,7 @@ def test_identification_of_regions_normal():
             print(f"Error: {e.stderr}")
             raise
 
+
     assert len(regions) == 1
     assert regions[0].chromosome == '2'
     assert regions[0].end == 103230976
@@ -59,11 +66,21 @@ def test_identification_of_regions_normal():
 
 def test_identification_of_regions_small_padding():
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    exposure_loc = os.path.join(current_dir, '../example_files/non_causal_exposure.txt')
+
+    original_input_to_gwas_catalog_dict = {'pos_name': 'rsid', 'position': 'base_pair_location', 'reference_allele': 'other_allele',
+                                           'se':'standard_error', 'pval': 'p_value', 'n_iids': 'n'}
+    exposure_df = (pd.read_csv(os.path.join(current_dir, '../example_files/non_causal_exposure.txt'), sep='\t')
+                   .rename(columns = original_input_to_gwas_catalog_dict))
+
+    # exposure_loc = os.path.join(current_dir, '../example_files/non_causal_exposure.txt')
     reference_bed = os.path.join(current_dir, '../example_files/reference_cohort')
 
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_dir = os.path.join(tmpdir, 'tmp_integration_testing_')
+
+        exposure_loc = os.path.join(tmp_dir + 'exposure_assocs_renamed.')
+        exposure_df.to_csv(exposure_loc, sep='\t', index=False)
+
         try:
             regions = identify_regions(
                 exposure_loc,
