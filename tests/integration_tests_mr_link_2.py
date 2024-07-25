@@ -190,4 +190,32 @@ def test_mr_link_2_integration_non_causal():
         assert np.isclose(data_frame['p(sigma_y)'], 7.011323342257353e-136)
 
 
+def test_mr_link_2_integration_non_causal_gwas_catalog_format():
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_loc = f'{tmpdir}/tmp_integration_testing_'
+
+        command = [
+            sys.executable, f"{current_dir}/../mr_link_2_standalone.py",
+            "--reference_bed", f"{current_dir}/../example_files/reference_cohort",
+            "--sumstats_exposure", f"{current_dir}/../example_files/non_causal_exposure.txt",
+            "--sumstats_outcome", f"{current_dir}/../example_files/gwas_catalog_format.txt",
+            "--out", f'{tmp_loc}gwas_catalog_format_non_causal.txt'
+        ]
+
+        result = subprocess.run(command, capture_output=True, text=True)
+        assert result.returncode == 0, f"Command failed with return code {result.returncode}. Output: {result.stdout} Error: {result.stderr}"
+
+        data_frame = pd.read_csv(f'{tmp_loc}gwas_catalog_format_non_causal.txt', sep='\t')
+
+
+        assert np.isclose(data_frame.alpha, -0.0330966574547156)
+        assert np.isclose(data_frame['se(alpha)'], 0.0529061811094349)
+        assert np.isclose(data_frame['p(alpha)'], 0.5315953131580522)
+
+        assert np.isclose(data_frame.sigma_x,0.5641943699065054)
+        assert np.isclose(data_frame.sigma_y, 0.1642151919013568)
+        assert np.isclose(data_frame['se(sigma_y)'], 0.0066189399600698)
+        assert np.isclose(data_frame['p(sigma_y)'], 7.011323342257353e-136)
 
