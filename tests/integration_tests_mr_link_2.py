@@ -133,14 +133,14 @@ def test_mr_link_2_integration_yes_causal():
 
         assert result.returncode == 0, f"Command failed with return code {result.returncode}. Output: {result.stdout} Error: {result.stderr}"
 
-        assert np.isclose(data_frame.alpha, 0.5283474152585884)
-        assert np.isclose(data_frame['se(alpha)'], 0.0592090740468238)
-        assert np.isclose(data_frame['p(alpha)'], 4.521077372678238e-19)
+        assert np.isclose(data_frame.alpha, 0.4193872544798938)
+        assert np.isclose(data_frame['se(alpha)'], 0.0565878953774011)
+        assert np.isclose(data_frame['p(alpha)'], 1.25110890260147e-13)
 
-        assert np.isclose(data_frame.sigma_x,0.6782720060990184)
-        assert np.isclose(data_frame.sigma_y, 0.1864623964108834)
-        assert np.isclose(data_frame['se(sigma_y)'], 0.0075060246861747)
-        assert np.isclose(data_frame['p(sigma_y)'], 3.1793306426563448e-136)
+        assert np.isclose(data_frame.sigma_x,0.564994403645872)
+        assert np.isclose(data_frame.sigma_y, 0.1549295595449322)
+        assert np.isclose(data_frame['se(sigma_y)'], 0.0062419901963417)
+        assert np.isclose(data_frame['p(sigma_y)'], 5.3812527742659674e-136)
 
 
 
@@ -163,14 +163,14 @@ def test_mr_link_2_integration_non_causal():
 
         assert result.returncode == 0, f"Command failed with return code {result.returncode}. Output: {result.stdout} Error: {result.stderr}"
 
-        assert np.isclose(data_frame.alpha, -0.0079021282679119)
-        assert np.isclose(data_frame['se(alpha)'], 0.0524462186199138)
-        assert np.isclose(data_frame['p(alpha)'], 0.880235189575116)
+        assert np.isclose(data_frame.alpha, -0.0330966574547156)
+        assert np.isclose(data_frame['se(alpha)'], 0.0529061811094349)
+        assert np.isclose(data_frame['p(alpha)'], 0.5315953131580522)
 
-        assert np.isclose(data_frame.sigma_x,0.6088953690703098)
-        assert np.isclose(data_frame.sigma_y, 0.1666327017940939)
-        assert np.isclose(data_frame['se(sigma_y)'], 0.0067138330993415)
-        assert np.isclose(data_frame['p(sigma_y)'], 5.5482348469813496e-136)
+        assert np.isclose(data_frame.sigma_x,0.5641943699065054)
+        assert np.isclose(data_frame.sigma_y, 0.1642151919013568)
+        assert np.isclose(data_frame['se(sigma_y)'], 0.0066189399600698)
+        assert np.isclose(data_frame['p(sigma_y)'], 7.011323342257353e-136)
 
 
 

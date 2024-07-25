@@ -858,7 +858,7 @@ def mr_link2_on_region(region: StartEndRegion,
                        maf_threshold: float,
                        max_correlation: float,
                        regional_ld_matrix: np.ndarray,
-                       snps_in_ld_matrix: list,
+                       snps_alleles_in_ld_matrix: list[tuple],
                        tmp_prepend: str,
                        var_explained_grid: list,
                        verbosity=0,
@@ -915,7 +915,9 @@ def mr_link2_on_region(region: StartEndRegion,
         print(regional_exp_df.shape)
         print(regional_out_df.shape)
 
-    shared_snps = set(regional_exp_df.pos_name.tolist()) & set(regional_out_df.pos_name.tolist())
+    ld_matrix_snp_names = {x[0] for x in snps_alleles_in_ld_matrix}
+    ld_matrix_snp_to_allele_dict = {x[0]: (x[1], x[2]) for x in snps_alleles_in_ld_matrix}
+    shared_snps = set(regional_exp_df.pos_name.tolist()) & set(regional_out_df.pos_name.tolist()) & ld_matrix_snp_names
 
     if verbosity:
         print(f'Found {len(shared_snps)} shared SNPS')
@@ -926,81 +928,48 @@ def mr_link2_on_region(region: StartEndRegion,
     regional_exp_df = regional_exp_df[regional_exp_df.pos_name.isin(shared_snps)]
     regional_out_df = regional_out_df[regional_out_df.pos_name.isin(shared_snps)]
 
-    ## Make a correlation matrix of these SNPs
-    files_to_remove = []
-    snp_file = f'{tmp_prepend}_{region}_overlapping_snps.txt'
-    plink_out = f'{tmp_prepend}_{region}_plink_correlation'
-
-    with open(snp_file, 'w') as f:
-        for snp in sorted(shared_snps):
-            f.write(f'{snp}\n')
-
-    subprocess.run(['plink',
-                    '--bfile', bed_file,
-                    '--extract', snp_file,
-                    '--maf', f'{maf_threshold}',
-                    '--make-just-bim',
-                    '--r', 'square', 'bin',
-                    '--out', plink_out], check=True, stderr=stderr, stdout=stdout)
-
-    # m_snps_from_log, n_individuals = match_n_variants_n_individuals_from_plink_log(f'{plink_out}.log')
-    # if verbosity:
-    #     print(m_snps_from_log, n_individuals)
-    #
-    # files_to_remove += [f'{plink_out}.{x}' for x in ['bim', 'log', 'ld.bin', 'nosex']]
-    # files_to_remove.append(snp_file)
-    #
-    # # read in the correlation matrix
-    # correlation_mat = np.fromfile(f'{plink_out}.ld.bin')
-    # n_snps = int(np.floor(np.sqrt(correlation_mat.shape[0])))
-    # correlation_mat = correlation_mat[:].reshape((n_snps, n_snps))
-
-    correlation_mat = regional_ld_matrix
-
-
-    # remove NA's from correlation matrix because turns out there are still some (didnt expect these to exist)
-    idxs_to_remove = np.any(np.isnan(correlation_mat), axis=1)
-
-    # remove highly correlated, as it could be a source of eigenvalue non-convergence
-    to_remove = set()
-    indexes = np.where(np.tril(np.abs(correlation_mat), k=-1) >= max_correlation)
-    for a, b in zip(indexes[0], indexes[1]):  # I don't understand why this happens in two tuples.
-        if a in to_remove:
-            continue
-        elif b in to_remove:
-            continue
-        else:
-            to_remove.add(b)  # keep the first row
-            idxs_to_remove[b] = True
-
-    correlation_mat = correlation_mat[~idxs_to_remove, :][:, ~idxs_to_remove]
-    if verbosity:
-        print('Max correlation value in correlation matrix:', np.max(np.tril(correlation_mat, k=-1)))
-        print(correlation_mat[:10, :10])
-
-    if verbosity:
-        print('Nas in correlation mat:', np.any(np.isnan(correlation_mat)))
-        print(idxs_to_remove)
-        print(np.where(np.isnan(correlation_mat)))
-
-    ordered_snps = snps_in_ld_matrix
+    ## make sure that the LD matrix contains only the shared SNPs.
+    indexes_to_keep = np.asarray([i for i in range(len(snps_alleles_in_ld_matrix)) if snps_alleles_in_ld_matrix[i][0] in shared_snps], dtype=int)
+    ordered_snps = [snps_alleles_in_ld_matrix[i][0] for i in range(len(snps_alleles_in_ld_matrix)) if snps_alleles_in_ld_matrix[i][0] in shared_snps]
+    correlation_mat = copy.copy(regional_ld_matrix[indexes_to_keep, :][:, indexes_to_keep])
 
     ## harmonize the betas, exposure is reference
     snp_to_beta_dict = {}
-    exp_dict = {row.pos_name: [row.beta, row.effect_allele, row.reference_allele, row.pval, row.se]
-                for i, row in regional_exp_df.iterrows()}
-    out_dict = {row.pos_name: [row.beta, row.effect_allele, row.reference_allele, row.pval, row.se]
-                for i, row in regional_out_df.iterrows()}
+    exp_dict = dict(zip(regional_exp_df['pos_name'],
+                        zip(regional_exp_df['beta'],
+                            regional_exp_df['effect_allele'],
+                            regional_exp_df['reference_allele'],
+                            regional_exp_df['pval'],
+                            regional_exp_df['se'])))
 
+    out_dict = dict(zip(regional_out_df['pos_name'],
+                        zip(regional_out_df['beta'],
+                            regional_out_df['effect_allele'],
+                            regional_out_df['reference_allele'],
+                            regional_out_df['pval'],
+                            regional_out_df['se'])))
+
+    """ 
+    harmonize the summary statistics 
+    to the LD reference alleles.  
+    """
     for pos_name in shared_snps:
-        exp_beta, ref_a1, ref_a2, _, _ = exp_dict[pos_name]
+        ## Use the LD matrix alleles as the underlying reference
+        ref_a1, ref_a2 = ld_matrix_snp_to_allele_dict[pos_name]
+        exp_beta, exp_a1, exp_a2, _, _ = exp_dict[pos_name]
         out_beta, out_a1, out_a2, _, _ = out_dict[pos_name]
-        if ref_a1 == out_a1 and ref_a2 == out_a2:
-            snp_to_beta_dict[pos_name] = [exp_beta, out_beta]
-        elif ref_a1 == out_a2 and ref_a2 == out_a1:  # alleles do not match
-            snp_to_beta_dict[pos_name] = [exp_beta, -1 * out_beta]
-        else:
-            raise ValueError(f'Alleles do not match for {pos_name}')
+
+        # test if the alleles are the same, if not we should not continue
+        if {exp_a1, exp_a2} != {ref_a1, ref_a2} or {out_a1, out_a2} != {ref_a1, ref_a2}:
+            raise ValueError(f'Harmonization error in snp {pos_name}, ld mat: {(ref_a1, ref_a2)}, exposure: {(exp_a1, out_a2)} outcome: {(out_a1, out_a2)}')
+
+        # as we tested that the alelles are the same set, only have to look at alignment.
+        if exp_a1 != ref_a1:
+            exp_beta = -1 * exp_beta
+        if out_a1 != ref_a1:
+            out_beta = -1 * out_beta
+
+        snp_to_beta_dict[pos_name] = [exp_beta, out_beta]
 
     ## these should have been normalized. In my case they are.
     exp_betas = np.asarray([snp_to_beta_dict[x][0] for x in ordered_snps], dtype=float)
@@ -1009,10 +978,10 @@ def mr_link2_on_region(region: StartEndRegion,
     out_betas = np.asarray([snp_to_beta_dict[x][1] for x in ordered_snps], dtype=float)
     out_pvals = np.asarray([out_dict[x][3] for x in ordered_snps], dtype=float)
 
+
     """
     Now, the optimization
     """
-
     m_snps = exp_betas.shape[0]
 
     print(f'We have {m_snps} snps in the {region} region')
@@ -1495,34 +1464,31 @@ Pleiotropy robust cis Mendelian randomization
                 (exposure_df.position.astype(int) <= region.end)
                 ].copy()
 
-            # regional_ld_matrix_, snps_in_ld_matrix_ = read_ld_matrix_plink(reference_bed,
-            #                                                              regional_exposure_df.pos_name,
-            #                                                              maf_threshold=maf_threshold,
-            #                                                              max_correlation=max_correlation,
-            #                                                              tmp_prepend=f'{tmp_prepend}_ld_matrix_{str(region)}'
-            #                                                              )
+
             regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
                                                                          regional_exposure_df.pos_name,
                                                                          maf_threshold=maf_threshold,
                                                                          max_correlation=max_correlation,
                                                                          )
+            snps_and_alleles_in_ld_matrix = [(x, plink_geno_obj.bim_data[x][2], plink_geno_obj.bim_data[x][3]) for x in
+                                             snps_in_ld_matrix]
 
-            try:
-                regional_results = mr_link2_on_region(region,
-                                                      exposure_df,
-                                                      outcome_df,
-                                                      reference_bed,
-                                                      maf_threshold,
-                                                      max_correlation,
-                                                      regional_ld_matrix,
-                                                      snps_in_ld_matrix=snps_in_ld_matrix,
-                                                      tmp_prepend=tmp_dir,
-                                                      verbosity=verbosity,
-                                                      var_explained_grid=var_explained_grid)
-            except Exception as x:
-                exceptions.append((region, x))
-                print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
-                continue
+            # try:
+            regional_results = mr_link2_on_region(region,
+                                                  exposure_df,
+                                                  outcome_df,
+                                                  reference_bed,
+                                                  maf_threshold,
+                                                  max_correlation,
+                                                  regional_ld_matrix,
+                                                  snps_alleles_in_ld_matrix=snps_and_alleles_in_ld_matrix,
+                                                  tmp_prepend=tmp_dir,
+                                                  verbosity=verbosity,
+                                                  var_explained_grid=var_explained_grid)
+            # except Exception as x:
+            #     exceptions.append((region, x))
+            #     print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
+            #     continue
 
             if regional_results is None:
                 exceptions.append((region, 'NONE_RESULT'))

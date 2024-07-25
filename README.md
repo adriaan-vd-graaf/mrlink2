@@ -59,17 +59,17 @@ After running these two commands (takes about 2 seconds each), they will output 
 ```
 # causal effect
 region                  var_explained   m_snps_overlap   alpha                   se(alpha)               p(alpha)                sigma_y                 se(sigma_y)             p(sigma_y)              sigma_x                 function_time
-2:101532661-103480976	0.99	        1131	         0.5283473429025785	     0.059209065938272826	 4.521077372682387e-19	 0.186462435522639	     0.007506026260614542	 3.179330642667223e-136	 0.6782719753276382	     0.09963393211364746
+2:101532661-103480976	0.99	        1131	         0.4193872544798938	     0.0565878953774011	     1.25110890260147e-13	 0.1549295595449322	     0.00624199019634178	 5.3812527742659674e-136 0.564994403645872	     0.09744000434875488
 ```
-In the above line we see that the causal effect `alpha` is 0.52, with a _P_ value of 4.5x10^-19. The `sigma_y` 
-estimate is large (0.18), but very significant (P: 3.1x10^-136). Indicating a causal effect, as well as a pleiotropic effect.  
+In the above line we see that the causal effect `alpha` is 0.42 , with a _P_ value of 1.3x10^-13. The `sigma_y` 
+estimate is large (0.155), and very significant (P: 5.3x10^-136). Indicating a causal effect, as well as a pleiotropic effect.  
 ```
 # non causal effect
 region                  var_explained   m_snps_overlap   alpha                   se(alpha)               p(alpha)                sigma_y                 se(sigma_y)             p(sigma_y)              sigma_x                 function_time
-2:101515908-103411057	0.99	        1131	         -0.007902079145919932	 0.05244589259853782	 0.880235189575116	     0.1666326648242604	     0.006713831609782223	 5.5482348469902104e-136 0.6088953054633884 	 0.07275605201721191
+2:101515908-103411057	0.99	        1131	         -0.03309665745471561	 0.052906181109434916	 0.5315953131580522	     0.16421519190135686	 0.006618939960069835	 7.011323342257353e-136	 0.5641943699065054	     0.0805368423461914
 ```
-In the following example, line we see that the causal effect `alpha` is close to zero, with a _P_ value of 0.88. The `sigma_y` 
-estimate again is large (0.16) and very significant (P: 5.5x10^-136). This indicates that the locus is very pleiotropic.
+In the following example, line we see that the causal effect `alpha` is close to zero, with a _P_ value of 0.52. The `sigma_y` 
+estimate again is large (0.16) and very significant (P: 7.0x10^-136). This indicates that the locus is very pleiotropic.
 
 Alternatively, you can use the `test_commands.sh` script to run a few tests, and have a look at their results.
 
