@@ -12,13 +12,13 @@ We appreciate everybody trying to use our software, so we try to come back to yo
 ### Requirements
 MR-link-2 has been tested on MacOS X and Linux combined with Python 3.9, 3.10 and 3.11. 
 Although not tested, every Python version from 3.6 onwards should work.    
-We require some (standard) python packages to be installed, these are: `numpy`, `scipy` and `pandas`.
+We require some (standard) python packages to be installed, these are: `numpy`, `scipy` and `pandas` and `bitarray`.
 xf you want to ensure all the tests run, `pytest` is also necessary.
 If they haven't been installed, please install these using pip.
 In the command line (shell, terminal), type: 
 
 ```{bash}
-pip3 install numpy scipy pandas pytest
+pip3 install numpy scipy pandas bitarray pytest
 ```
 On top of this, we require plink1.9 to be present in your PATH variable. 
 Check this by typing `which plink` in your  shell. 

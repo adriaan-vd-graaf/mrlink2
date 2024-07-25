@@ -12,6 +12,105 @@ import scipy
 import scipy.io
 from typing import Any, Tuple, Dict
 import tempfile
+import bitarray
+
+from collections import OrderedDict
+
+class PlinkGenoReader:
+    """
+    TODO documentation
+    """
+
+    def __init__(self, plink_bed_prepend):
+
+        self.prepend = plink_bed_prepend
+        self.bed_loc = f'{self.prepend}.bed'
+        self.bim_loc = f'{self.prepend}.bim'
+        self.fam_loc = f'{self.prepend}.fam'
+
+        for filename in [self.bed_loc, self.bim_loc, self.fam_loc]:
+            if not os.path.exists(filename):
+                raise ValueError(f'Error Could not find {filename=} when reading the genotype reference')
+
+        self.n_individuals = 0
+        with open(self.fam_loc, 'r') as f:
+            for line in  f:
+                if not line in ['\n', '\r\n']:
+                    self.n_individuals+=1
+
+        last_chromosome_position = ('0', 0)
+
+        self._decoder = {0: bitarray.bitarray('00'),  #homoz A1 (usually minor)
+                         1: bitarray.bitarray('01'),  #heteroz
+                         2: bitarray.bitarray('11'),  #homoz A2 (usually major)
+                         3: bitarray.bitarray('10'),  # missing
+                         }
+
+        ## Ensured that this is ordered, so we can find a range.
+        self.bim_data = OrderedDict()
+        self.snp_name_to_variant_order = {}
+        with open(self.bim_loc, 'r') as f:
+            for i, line in enumerate(f):
+                split = line.split()
+                self.bim_data[split[1]] = (split[0], split[3], split[4], split[5])
+                self.snp_name_to_variant_order[split[1]] = i
+
+                if split[0] != last_chromosome_position[0]:
+                    last_chromosome_position = (split[0], int(split[3]))
+                elif last_chromosome_position[1] > int(split[3]):
+                    raise ValueError(f'Error: bim file is not ordered correctly at {split}')
+                else:
+                    last_chromosome_position = (split[0], int(split[3]))
+
+        self.n_variants = len(self.bim_data)
+
+    def read_list_of_snps_into_geno_array(self, snps_to_load: set, missing_encoding=3, dtype=float):
+        """
+        # TODO fix documentation.
+        Reads a bed file into a numpy array.
+        """
+        self._missing_encoding = missing_encoding
+
+        snps_to_load = list(snps_to_load)
+        variant_idxes_to_load = [self.snp_name_to_variant_order[x] for x in snps_to_load]
+        n_variants = len(snps_to_load)
+
+        bytes_per_variant = int(np.ceil(self.n_individuals / 4))
+        byte_array = bytearray(b"\0" * bytes_per_variant * len(snps_to_load))
+
+        with open(self.bed_loc, "rb") as bed_file:
+            magick = bed_file.read(3)
+            if magick != b'l\x1b\x01':
+                raise ValueError("Plink file magic string is not correct.")
+
+            byte_array_position = 0
+            for variant_idx in variant_idxes_to_load:
+                bed_file.seek((variant_idx * bytes_per_variant) + 3, 0)
+                byte_array[byte_array_position: byte_array_position+bytes_per_variant] = bed_file.read(bytes_per_variant)
+                byte_array_position = byte_array_position + bytes_per_variant
+
+        genotypes = np.zeros((self.n_individuals, n_variants), dtype=np.uint8)
+
+        offset = 0
+        for i in range(n_variants):
+            bits = bitarray.bitarray(endian="little")
+            bits.frombytes(byte_array[offset:(offset+bytes_per_variant)])
+            array = bits.decode(self._decoder)[:self.n_individuals]
+            genotypes[:,i] = array
+            offset+=bytes_per_variant
+
+        genotypes = np.array(genotypes, dtype=dtype)
+        genotypes[genotypes == 3] = missing_encoding
+
+        #convert genotypes to minor allele is coded as one.
+        tmp_geno = copy.deepcopy(genotypes)
+        tmp_geno[genotypes == 2] = 0
+        tmp_geno[genotypes == 0] = 2
+        genotypes = tmp_geno
+
+
+        self.genotypes = genotypes
+        return genotypes, snps_to_load
 
 
 class StartEndRegion:
@@ -758,6 +857,8 @@ def mr_link2_on_region(region: StartEndRegion,
                        bed_file: str,
                        maf_threshold: float,
                        max_correlation: float,
+                       regional_ld_matrix: np.ndarray,
+                       snps_in_ld_matrix: list,
                        tmp_prepend: str,
                        var_explained_grid: list,
                        verbosity=0,
@@ -842,17 +943,20 @@ def mr_link2_on_region(region: StartEndRegion,
                     '--r', 'square', 'bin',
                     '--out', plink_out], check=True, stderr=stderr, stdout=stdout)
 
-    m_snps_from_log, n_individuals = match_n_variants_n_individuals_from_plink_log(f'{plink_out}.log')
-    if verbosity:
-        print(m_snps_from_log, n_individuals)
+    # m_snps_from_log, n_individuals = match_n_variants_n_individuals_from_plink_log(f'{plink_out}.log')
+    # if verbosity:
+    #     print(m_snps_from_log, n_individuals)
+    #
+    # files_to_remove += [f'{plink_out}.{x}' for x in ['bim', 'log', 'ld.bin', 'nosex']]
+    # files_to_remove.append(snp_file)
+    #
+    # # read in the correlation matrix
+    # correlation_mat = np.fromfile(f'{plink_out}.ld.bin')
+    # n_snps = int(np.floor(np.sqrt(correlation_mat.shape[0])))
+    # correlation_mat = correlation_mat[:].reshape((n_snps, n_snps))
 
-    files_to_remove += [f'{plink_out}.{x}' for x in ['bim', 'log', 'ld.bin', 'nosex']]
-    files_to_remove.append(snp_file)
+    correlation_mat = regional_ld_matrix
 
-    # read in the correlation matrix
-    correlation_mat = np.fromfile(f'{plink_out}.ld.bin')
-    n_snps = int(np.floor(np.sqrt(correlation_mat.shape[0])))
-    correlation_mat = correlation_mat[:].reshape((n_snps, n_snps))
 
     # remove NA's from correlation matrix because turns out there are still some (didnt expect these to exist)
     idxs_to_remove = np.any(np.isnan(correlation_mat), axis=1)
@@ -879,13 +983,7 @@ def mr_link2_on_region(region: StartEndRegion,
         print(idxs_to_remove)
         print(np.where(np.isnan(correlation_mat)))
 
-    # read in the variant ordering of the correlation matrix
-    ordered_snps = []
-    with open(f'{plink_out}.bim', 'r') as f:
-        for i, line in enumerate(f):
-            # if there is a nan value in de matrix, we don't add it.
-            if ~idxs_to_remove[i]:
-                ordered_snps.append(line.split()[1])
+    ordered_snps = snps_in_ld_matrix
 
     ## harmonize the betas, exposure is reference
     snp_to_beta_dict = {}
@@ -1018,6 +1116,130 @@ def mr_link2_on_region(region: StartEndRegion,
     return mr_results_df
 
 
+def read_ld_matrix_local(geno_file_obj: PlinkGenoReader, list_of_snps, maf_threshold, max_correlation):
+    """
+    return a correlation matrix of a list of snps.
+
+    This function has been tested to produce the same results as the plink read ld matrix function, very happy about this!
+
+    :param geno_file_obj:
+    :param list_of_snps:
+    :param maf_threshold:
+    :param max_correlation:
+    :return:
+    """
+
+    def maf_func(x):
+        return np.sum(x) / (x.shape[0] * 2)
+
+    overlapping_snps = set(list_of_snps) & geno_file_obj.snp_name_to_variant_order.keys()
+    if len(overlapping_snps) == 0:
+        raise ValueError(f'No overlapping SNPs between the LD reference and the region {list_of_snps[:10]=}, '
+                         f'{list(geno_file_obj.snp_name_to_variant_order)[:10]=}')
+
+    """
+    Sorting the overlapping SNPs based on their position, to ensure correctness between the plink implementation
+    """
+
+    overlapping_snps = [x[0] for x in sorted([(snp_name, position) for snp_name, position in
+                                              zip(overlapping_snps, [geno_file_obj.bim_data[x] for x in overlapping_snps])],
+                                             key=lambda x: int(x[1][1]))]
+
+    genotypes, all_snps = geno_file_obj.read_list_of_snps_into_geno_array(overlapping_snps)
+    #drop genotypes with missing values.
+    missing_values = np.sum(genotypes == 3, axis=0) >= 1
+
+    # Calculate minor allele frequencies (MAFs)
+    mafs = np.apply_along_axis(maf_func, 0, genotypes)
+    maf_filter = np.logical_or(mafs <= maf_threshold,
+                                mafs >= 1-maf_threshold)
+
+    genotypes = genotypes[:, np.logical_and(~missing_values, ~maf_filter)]
+    genotype_matrix_snps = [x for x, bool_1, bool_2, in zip(all_snps, missing_values, maf_filter)
+                            if not (bool_1 or bool_2)]
+    ld_matrix = np.corrcoef(genotypes.T)
+
+    # Remove highly correlated, as it could be a source of eigenvalue non-convergence
+    idxs_to_remove = np.any(np.isnan(ld_matrix), axis=1)
+
+    ld_matrix, ordered_snps = remove_highly_correlated(ld_matrix, overlapping_snps, max_correlation)
+
+    return ld_matrix, ordered_snps
+
+def read_ld_matrix_plink(bed_prepend, list_of_snps, maf_threshold, max_correlation, tmp_prepend):
+
+    stderr = subprocess.DEVNULL if not verbosity else None
+    stdout = subprocess.DEVNULL if not verbosity else None
+
+    ## Make a correlation matrix of these SNPs
+    files_to_remove = []
+    snp_file = f'{tmp_prepend}_overlapping_snps.txt'
+    plink_out = f'{tmp_prepend}_plink_correlation'
+
+    with open(snp_file, 'w') as f:
+        for snp in sorted(list_of_snps):
+            f.write(f'{snp}\n')
+
+    subprocess.run(['plink',
+                    '--bfile', bed_prepend,
+                    '--extract', snp_file,
+                    '--maf', f'{maf_threshold}',
+                    '--make-just-bim',
+                    '--r', 'square', 'bin',
+                    '--out', plink_out], check=True, stderr=stderr, stdout=stdout)
+
+    m_snps_from_log, n_individuals = match_n_variants_n_individuals_from_plink_log(f'{plink_out}.log')
+    if verbosity:
+        print(m_snps_from_log, n_individuals)
+
+    files_to_remove += [f'{plink_out}.{x}' for x in ['bim', 'log', 'ld.bin', 'nosex']]
+    files_to_remove.append(snp_file)
+
+    # read in the correlation matrix
+    correlation_mat = np.fromfile(f'{plink_out}.ld.bin')
+    correlation_mat = correlation_mat.reshape((int(np.floor(np.sqrt(correlation_mat.shape))),
+                                               int(np.floor(np.sqrt(correlation_mat.shape)))))
+
+    ordered_snps = []
+    with open(f'{plink_out}.bim', 'r') as f:
+        for i, line in enumerate(f):
+            ordered_snps.append(line.split()[1])
+
+    correlation_mat, ordered_snps = remove_highly_correlated(correlation_mat, ordered_snps, max_correlation)
+
+    ## cleanup
+    for filename in files_to_remove:
+        os.remove(filename)
+
+
+    return correlation_mat, ordered_snps
+
+def remove_highly_correlated(ld_matrix, snp_ordering, max_correlation):
+
+    # remove NA's from correlation matrix because turns out there are still some (didnt expect)
+    idxs_to_remove = np.any(np.isnan(ld_matrix), axis=1)
+
+    # remove highly correlated, as it could be a source of eigenvalue non-convergence
+    to_remove = set()
+    indexes = np.where(np.tril(np.abs(ld_matrix), k=-1) >= max_correlation)
+    for a, b in zip(indexes[0], indexes[1]):  # I don't understand why this happens in two tuples.
+        if a in to_remove:
+            continue
+        elif b in to_remove:
+            continue
+        else:
+            to_remove.add(b)  # keep the first row
+            idxs_to_remove[b] = True
+
+    ld_matrix = ld_matrix[~idxs_to_remove, :][:, ~idxs_to_remove]
+
+    #Ugly, but works.
+    ordered_snps = pd.DataFrame({"snp_names": snp_ordering})
+    ordered_snps = ordered_snps.loc[~idxs_to_remove, 'snp_names'].tolist()
+
+    return ld_matrix, ordered_snps
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
@@ -1143,6 +1365,8 @@ Pleiotropy robust cis Mendelian randomization
     verbosity = args.verbose
     files_to_remove = set()
 
+    plink_geno_obj = PlinkGenoReader(reference_bed)
+
     with tempfile.TemporaryDirectory() as tmp_prepend:
         tmp_dir = f'{tmp_prepend}/tmp_'
         # This is some preprocessing of the summary statistic files to make sure that we filter for at least 95% sample size
@@ -1265,6 +1489,24 @@ Pleiotropy robust cis Mendelian randomization
                 print(f'Already done {region}, continueing with the next one')
                 continue
 
+            regional_exposure_df = exposure_df[
+                (exposure_df.chromosome.astype(str) == region.chromosome) &
+                (exposure_df.position.astype(int) >= region.start) &
+                (exposure_df.position.astype(int) <= region.end)
+                ].copy()
+
+            # regional_ld_matrix_, snps_in_ld_matrix_ = read_ld_matrix_plink(reference_bed,
+            #                                                              regional_exposure_df.pos_name,
+            #                                                              maf_threshold=maf_threshold,
+            #                                                              max_correlation=max_correlation,
+            #                                                              tmp_prepend=f'{tmp_prepend}_ld_matrix_{str(region)}'
+            #                                                              )
+            regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
+                                                                         regional_exposure_df.pos_name,
+                                                                         maf_threshold=maf_threshold,
+                                                                         max_correlation=max_correlation,
+                                                                         )
+
             try:
                 regional_results = mr_link2_on_region(region,
                                                       exposure_df,
@@ -1272,6 +1514,8 @@ Pleiotropy robust cis Mendelian randomization
                                                       reference_bed,
                                                       maf_threshold,
                                                       max_correlation,
+                                                      regional_ld_matrix,
+                                                      snps_in_ld_matrix=snps_in_ld_matrix,
                                                       tmp_prepend=tmp_dir,
                                                       verbosity=verbosity,
                                                       var_explained_grid=var_explained_grid)
