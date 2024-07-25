@@ -138,10 +138,16 @@ options:
 
 ## The input files for MR-link-2
 MR-link-2 requires 2 summary statistics files that are formatted the same and a genotype file in the plink 
-.bed/.bim/.fam format
+.bed/.bim/.fam format. 
 
-The summary statistics files should be a tab ('\t') separated file at have the following columns, which are mostly self explanatory.
 
+**NEW**: MR-link-2 now accepts 2 types of file formats, the 
+[GWAS summary statistics file format](https://www.ebi.ac.uk/gwas/docs/summary-statistics-format) and for legacy purposes
+a file format that was specifically generated for this program.
+
+If you don't have your summary statistics in the GWAS summary statistics format, you can format it still in the following way:
+The summary statistics files should be a tab ('\t') separated file at have the following columns, which are mostly self 
+explanatory.
 ```
 'pos_name', # SNP names of the variants (must match those of the plink bed file) 
 'chromosome', # chromosome names (must match those in the plink bed file) 

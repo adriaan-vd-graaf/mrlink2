@@ -30,11 +30,17 @@ I guess these are to ensure that no regressions happen
 
 def test_identification_of_regions_normal():
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    exposure_loc = os.path.join(current_dir, '../example_files/yes_causal_exposure.txt')
+    original_input_to_gwas_catalog_dict = {'pos_name': 'rsid', 'position': 'base_pair_location', 'reference_allele': 'other_allele',
+                                           'se':'standard_error', 'pval': 'p_value', 'n_iids': 'n'}
+    exposure_df = (pd.read_csv(os.path.join(current_dir, '../example_files/yes_causal_exposure.txt'), sep='\t')
+                   .rename(columns = original_input_to_gwas_catalog_dict))
+
     reference_bed = os.path.join(current_dir, '../example_files/reference_cohort')
 
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_dir = os.path.join(tmpdir, 'tmp_integration_testing_')
+        exposure_loc = os.path.join(tmp_dir + 'exposure_assocs_renamed.')
+        exposure_df.to_csv(exposure_loc, sep='\t', index=False)
 
         try:
             regions = identify_regions(exposure_loc,
@@ -51,6 +57,7 @@ def test_identification_of_regions_normal():
             print(f"Error: {e.stderr}")
             raise
 
+
     assert len(regions) == 1
     assert regions[0].chromosome == '2'
     assert regions[0].end == 103230976
@@ -59,11 +66,21 @@ def test_identification_of_regions_normal():
 
 def test_identification_of_regions_small_padding():
     current_dir = os.path.dirname(os.path.abspath(__file__))
-    exposure_loc = os.path.join(current_dir, '../example_files/non_causal_exposure.txt')
+
+    original_input_to_gwas_catalog_dict = {'pos_name': 'rsid', 'position': 'base_pair_location', 'reference_allele': 'other_allele',
+                                           'se':'standard_error', 'pval': 'p_value', 'n_iids': 'n'}
+    exposure_df = (pd.read_csv(os.path.join(current_dir, '../example_files/non_causal_exposure.txt'), sep='\t')
+                   .rename(columns = original_input_to_gwas_catalog_dict))
+
+    # exposure_loc = os.path.join(current_dir, '../example_files/non_causal_exposure.txt')
     reference_bed = os.path.join(current_dir, '../example_files/reference_cohort')
 
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_dir = os.path.join(tmpdir, 'tmp_integration_testing_')
+
+        exposure_loc = os.path.join(tmp_dir + 'exposure_assocs_renamed.')
+        exposure_df.to_csv(exposure_loc, sep='\t', index=False)
+
         try:
             regions = identify_regions(
                 exposure_loc,
@@ -173,4 +190,32 @@ def test_mr_link_2_integration_non_causal():
         assert np.isclose(data_frame['p(sigma_y)'], 7.011323342257353e-136)
 
 
+def test_mr_link_2_integration_non_causal_gwas_catalog_format():
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_loc = f'{tmpdir}/tmp_integration_testing_'
+
+        command = [
+            sys.executable, f"{current_dir}/../mr_link_2_standalone.py",
+            "--reference_bed", f"{current_dir}/../example_files/reference_cohort",
+            "--sumstats_exposure", f"{current_dir}/../example_files/non_causal_exposure.txt",
+            "--sumstats_outcome", f"{current_dir}/../example_files/gwas_catalog_format.txt",
+            "--out", f'{tmp_loc}gwas_catalog_format_non_causal.txt'
+        ]
+
+        result = subprocess.run(command, capture_output=True, text=True)
+        assert result.returncode == 0, f"Command failed with return code {result.returncode}. Output: {result.stdout} Error: {result.stderr}"
+
+        data_frame = pd.read_csv(f'{tmp_loc}gwas_catalog_format_non_causal.txt', sep='\t')
+
+
+        assert np.isclose(data_frame.alpha, -0.0330966574547156)
+        assert np.isclose(data_frame['se(alpha)'], 0.0529061811094349)
+        assert np.isclose(data_frame['p(alpha)'], 0.5315953131580522)
+
+        assert np.isclose(data_frame.sigma_x,0.5641943699065054)
+        assert np.isclose(data_frame.sigma_y, 0.1642151919013568)
+        assert np.isclose(data_frame['se(sigma_y)'], 0.0066189399600698)
+        assert np.isclose(data_frame['p(sigma_y)'], 7.011323342257353e-136)
 
