@@ -1473,22 +1473,22 @@ Pleiotropy robust cis Mendelian randomization
             snps_and_alleles_in_ld_matrix = [(x, plink_geno_obj.bim_data[x][2], plink_geno_obj.bim_data[x][3]) for x in
                                              snps_in_ld_matrix]
 
-            # try:
-            regional_results = mr_link2_on_region(region,
-                                                  exposure_df,
-                                                  outcome_df,
-                                                  reference_bed,
-                                                  maf_threshold,
-                                                  max_correlation,
-                                                  regional_ld_matrix,
-                                                  snps_alleles_in_ld_matrix=snps_and_alleles_in_ld_matrix,
-                                                  tmp_prepend=tmp_dir,
-                                                  verbosity=verbosity,
-                                                  var_explained_grid=var_explained_grid)
-            # except Exception as x:
-            #     exceptions.append((region, x))
-            #     print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
-            #     continue
+            try:
+                regional_results = mr_link2_on_region(region,
+                                                      exposure_df,
+                                                      outcome_df,
+                                                      reference_bed,
+                                                      maf_threshold,
+                                                      max_correlation,
+                                                      regional_ld_matrix,
+                                                      snps_alleles_in_ld_matrix=snps_and_alleles_in_ld_matrix,
+                                                      tmp_prepend=tmp_dir,
+                                                      verbosity=verbosity,
+                                                      var_explained_grid=var_explained_grid)
+            except Exception as x:
+                exceptions.append((region, x))
+                print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
+                continue
 
             if regional_results is None:
                 exceptions.append((region, 'NONE_RESULT'))
