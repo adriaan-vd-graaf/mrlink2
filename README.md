@@ -12,13 +12,14 @@ We appreciate everybody trying to use our software, so we try to come back to yo
 ### Requirements
 MR-link-2 has been tested on MacOS X and Linux combined with Python 3.9, 3.10 and 3.11. 
 Although not tested, every Python version from 3.6 onwards should work.    
-We require some (standard) python packages to be installed, these are: `numpy`, `scipy` and `pandas` and `bitarray`.
+We require some (standard) python packages to be installed, these are: 
+`numpy`, `scipy`, `pandas`, `pyarrow`, `bitarray` and `duckdb`.
 If you want to ensure all the tests run, `pytest` is also necessary.
 If they haven't been installed, please install these using pip.
 In the command line (shell, terminal), type: 
 
 ```{bash}
-pip3 install numpy scipy pandas bitarray pytest
+pip3 install numpy scipy pandas bitarray pytest duckdb pyarrow
 ```
 On top of this, we require plink1.9 to be present in your PATH variable. 
 Check this by typing `which plink` in your  shell. 
@@ -29,9 +30,11 @@ This repository uses pytest to analyze results
 If you want to make sure that everything works as expected, please ensure you have pytest installed and run the 
 following command.
 ```{bash}
-pytest tests/integration_tests_mr_link_2.py
+pytest tests/*
 ```
 For this you need to have everything installed from the requirements, including `pytest`
+If everything passes, you are ready to go! 
+If not all the tests work, please open a github issue, and we'll get back to you ASAP.
 
 ### Example
 If you want to test MR-link-2 we have two examples:
@@ -100,7 +103,7 @@ options:
   --sumstats_exposure SUMSTATS_EXPOSURE
                         The summary statistics file of the exposure file. Please see the README file or the example_files folder for examples on how to make these files.
   
-  --sumstats_outcome SUMSTATS_OUTCOME
+  --sumstats_outcome SUMSTATS_OUTCOME [SUMSTATS_OUTCOME]
                         The summary statistics file of the outcome file. Please see the README file or the example_files folder for examples on how to make these files.
                         We allow multiple outcomes to be analyzed at the same time, include the files separated by spaces
   --out OUT             The path where to output results
@@ -118,6 +121,9 @@ options:
   --var_explained_grid VAR_EXPLAINED_GRID [VAR_EXPLAINED_GRID ...]
                         This field specifies the amount of variance explained of the LD matrix that is used by MR-link-2. You can add onto this field, and all variances explained will be added: --var_explained_grid 0.99 0.999 0.2 0.96 0.1 will perform an MR-link-2 estimate for all these values.
   --continue_analysis   Flag to continue an already started analysis, if specified this will look for a temporary file, and if it present, reuse its results. This can be handy if you have hundreds of associated regions, which can sometimes take a long time to run.
+  --regions_to_read_at_the_same_time NUMBER OF REGIONS
+                        Number of regions to read at the same time from a file. Will reduce I/O times, but can increase memory usage
+                        Only change this when you run into memory errors, or if you want to make a lot of comparisons.
   --prespecified_regions PRESPECIFIED_REGIONS
                         Specify which regions to do. format is the following: 
                         `{chr_1}:{start_1}-{end_1},{chr_2}:{start_2}-{end_2}`. 
