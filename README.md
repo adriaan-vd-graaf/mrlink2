@@ -211,6 +211,12 @@ The `_no_region` files will be written when, after matching the SNPs within the 
 
 ## Frequently asked questions 
 
+### How do I improve performance of my analysis
+Two tips on how to improve the performance of a large analysis run:
+1. Use parquet files as input for MR-link-2
+2. Use multiple phenotypes as outcomes for the same exposure.
+This will make sure that there is the least amount of double work to do that is possible.
+
 ### I need to input harmonized summary statistics, what does this mean?
 How to correctly harmonize a study depends on what you're studying. 
 For the analysis in our original publication, we performed the following steps:
