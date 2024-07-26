@@ -14,6 +14,9 @@ from typing import Any, Tuple, Dict
 import tempfile
 import bitarray
 
+import pyarrow.dataset as ds
+import duckdb
+
 from collections import OrderedDict
 
 class PlinkGenoReader:
@@ -1128,10 +1131,7 @@ def read_ld_matrix_local(geno_file_obj: PlinkGenoReader, list_of_snps, maf_thres
                             if not (bool_1 or bool_2)]
     ld_matrix = np.corrcoef(genotypes.T)
 
-    # Remove highly correlated, as it could be a source of eigenvalue non-convergence
-    idxs_to_remove = np.any(np.isnan(ld_matrix), axis=1)
-
-    ld_matrix, ordered_snps = remove_highly_correlated(ld_matrix, overlapping_snps, max_correlation)
+    ld_matrix, ordered_snps = remove_highly_correlated(ld_matrix, genotype_matrix_snps, max_correlation)
 
     return ld_matrix, ordered_snps
 
@@ -1180,8 +1180,8 @@ def read_ld_matrix_plink(bed_prepend, list_of_snps, maf_threshold, max_correlati
     for filename in files_to_remove:
         os.remove(filename)
 
-
     return correlation_mat, ordered_snps
+
 
 def remove_highly_correlated(ld_matrix, snp_ordering, max_correlation):
 
@@ -1209,6 +1209,67 @@ def remove_highly_correlated(ld_matrix, snp_ordering, max_correlation):
     return ld_matrix, ordered_snps
 
 
+
+def read_multiple_regions_from_parquet_duckdb(filename: str, regions, position_name='base_pair_location'):
+    # Create the dataset object
+    dataset = ds.dataset(filename, format='parquet', partitioning='hive')
+
+    # Connect to DuckDB
+    con = duckdb.connect()
+
+    # Register the dataset in DuckDB
+    con.register('sumstats', dataset)
+
+    # Construct the SQL query to fetch data for all regions
+    query_conditions = []
+    for region in regions:
+        chromosome = region.chromosome
+        start_position = region.start
+        end_position = region.end
+        condition = f"(chromosome = {chromosome} AND {position_name} > {start_position} AND {position_name} <= {end_position})"
+        query_conditions.append(condition)
+
+    query = "SELECT * FROM sumstats WHERE " + " OR ".join(query_conditions) + ";"
+
+    # Execute the query and fetch the result as a DataFrame
+    df = con.execute(query).df()
+    return df
+
+def read_regions_from_file(filename, region_or_regions):
+
+    original_input_to_gwas_catalog_dict = {'pos_name': 'rsid', 'position': 'base_pair_location', 'reference_allele': 'other_allele',
+                                           'se':'standard_error', 'pval': 'p_value', 'n_iids': 'n'}
+
+    if isinstance(region_or_regions, StartEndRegion):
+        regions = [region_or_regions]
+    elif isinstance(region_or_regions, list):
+        regions = region_or_regions
+    else:
+        raise NotImplementedError(f'Only StartEndRegion or list allowed in the constructor found: {region_or_regions.__type__}')
+
+    if filename[-5:] == '.parq':
+        ## parquet file
+
+        try:
+            return_df = read_multiple_regions_from_parquet_duckdb(filename, regions)
+        except:
+             return_df = read_multiple_regions_from_parquet_duckdb(filename, regions, position_name='position')
+
+        return_df = return_df.rename(columns=original_input_to_gwas_catalog_dict)
+        return return_df
+
+    else:
+        regions_in_df = []
+        full_df = pd.read_csv(filename, sep='\t')
+        full_df = full_df.rename(columns=original_input_to_gwas_catalog_dict)
+        for region in regions:
+            regions_in_df.append(full_df[(full_df['chromosome'].astype(str) == region.chromosome) &
+                                         (full_df['base_pair_location'].astype(int) > region.start) &
+                                         (full_df['base_pair_location'].astype(int) <= region.end)
+                                         ])
+        return pd.concat(regions_in_df)
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(
@@ -1231,6 +1292,10 @@ Pleiotropy robust cis Mendelian randomization
                         required=True,
                         help='The summary statistics file of the outcome file. Please see the README file or the\n'
                              'example_files folder for examples on how to make these files.'
+                             'You can specify more than one outcome per exposure',
+                        action='extend',
+                        nargs='+',
+                        type=str
                         )
     parser.add_argument('--out',
                         required=True,
@@ -1288,6 +1353,11 @@ Pleiotropy robust cis Mendelian randomization
                         action='store_true',
                         help='flag to _not_ normalize summary statistics')
 
+    parser.add_argument('--regions_to_read_at_the_same_time',
+                        type=int,
+                        default=10,
+                        help='Number of regions to read at the same time from a file. Will reduce I/O times, but can increase memory usage')
+
     parser.add_argument('--no_exclude_hla',
                         action='store_true',
                         help='flag to _not_ exclude the HLA region.')
@@ -1321,6 +1391,8 @@ Pleiotropy robust cis Mendelian randomization
     maf_threshold = float(args.maf_threshold)
     max_correlation = float(args.max_correlation)
 
+    read_chunk = int(args.regions_to_read_at_the_same_time)
+
     max_missingness = float(args.max_missingness)
     if 0.0 > max_missingness > 1.0:
         raise ValueError('Missingness needs to be between 0.0 and 1.0')
@@ -1352,7 +1424,12 @@ Pleiotropy robust cis Mendelian randomization
         tmp_exposure_sumstats_file = f'{tmp_dir}_exposure_sumstats.txt'
         files_to_remove.add(tmp_exposure_sumstats_file)
 
-        exposure_df = pd.read_csv(sumstats_exposure, sep='\t')
+        ## Can also be a parquet file.
+        if sumstats_exposure[-5:] == '.parq':
+            exposure_df = pd.read_parquet(sumstats_exposure)
+        else:
+            exposure_df = pd.read_csv(sumstats_exposure, sep='\t')
+
         exposure_df = exposure_df.rename(columns=original_input_to_gwas_catalog_dict)
         if len(set(exposure_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
             raise ValueError('Exposure summary statistics do not contain the necessary columns.\n'
@@ -1371,28 +1448,6 @@ Pleiotropy robust cis Mendelian randomization
         exposure_df.to_csv(tmp_exposure_sumstats_file, sep='\t', index=False)
         if verbosity:
             print(f'after missingness filter: {exposure_df.shape=}')
-
-        """
-        Outcome summary statistics loading and parsing
-        """
-        outcome_df = pd.read_csv(sumstats_outcome, sep='\t')
-        outcome_df = outcome_df.rename(columns=original_input_to_gwas_catalog_dict)
-
-        if len(set(outcome_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
-            raise ValueError('Outcome summary statistics do not contain the necessary columns.\n'
-                             f'The following columns should at least be present:\n{sumstats_necessary_colnames}\n'
-                             f'The following columns are present: {outcome_df.columns}')
-        if verbosity:
-            print(f'before missingness filter: {outcome_df.shape=}')
-        outcome_df = outcome_df[outcome_df.n >= (max_missingness * outcome_df.n.max())]
-
-        if not args.no_normalize_sumstats:
-            outcome_df['z'] = outcome_df['beta'] / outcome_df['standard_error']
-            outcome_df['beta'] = outcome_df.z / np.sqrt(outcome_df.n + outcome_df.z ** 2)
-            outcome_df['standard_error'] = 1 / np.sqrt(outcome_df.n + outcome_df.z ** 2)
-
-        if verbosity:
-            print(f'after missingness filter: {outcome_df.shape=}')
 
         """
         Perform clumping or use regions that were previously prespecified.
@@ -1438,11 +1493,10 @@ Pleiotropy robust cis Mendelian randomization
         if verbosity:
             print(exposure_df.head())
 
-        if verbosity:
-            print(outcome_df.head())
+
 
         all_results = []
-        regions_already_done = []
+        outcome_region_combinations_already_done = []
         previously_done_df = pd.DataFrame()
 
         combined_df = None
@@ -1450,76 +1504,153 @@ Pleiotropy robust cis Mendelian randomization
         if args.continue_analysis:
             if os.path.exists(args.out + '_tmp'):
                 previously_done_df = pd.read_csv(args.out + '_tmp', sep='\t')
-                regions_already_done = set(previously_done_df.region.unique())
+                outcome_region_combinations_already_done = set(zip(previously_done_df.region, previously_done_df.outcome_file))
 
             elif os.path.exists(args.out):
                 previously_done_df = pd.read_csv(args.out, sep='\t')
-                regions_already_done = set(previously_done_df.region.unique())
+                outcome_region_combinations_already_done = set(zip(previously_done_df.region, previously_done_df.outcome_file))
 
             all_results.append(previously_done_df)
             combined_df = pd.concat(all_results)
 
         exceptions = []
-        for region in regions_to_do:
-            regional_results = None
-            if str(region) in regions_already_done:
-                print(f'Already done {region}, continueing with the next one')
-                continue
+        """
+        HERE, we perform the reading of chunks 
+        """
+        for i in range(0, len(regions_to_do), read_chunk):
+            regions_chunk = regions_to_do[i:i + read_chunk]
+            chunked_regions_per_outcome = {}
+            """
+            This is an optimization and I don't love it. 
+            But can save like 5x of the time, so I'll take the time saving
+            
+            In essence what we do is load in up to <read_chunks> regions of the outcome files.
+            After which we apply MR-link-2 on all the loaded files. 
+            
+            In profiling, I found that this is substantially faster than reading a region one at a time.
+            
+            This is especially valuable when we analyze parquet files. 
+            
+            """
+            for outcome_location in sumstats_outcome:
+                """
+                It is necessary to also check if the region has been done before.
+                makes it look ugly, but retains robustness and removes double work.
+                """
+                regions_for_this_outcome = []
+                for region in regions_chunk:
+                    if (str(region), outcome_location) in outcome_region_combinations_already_done:
+                        print(f'Already done {outcome_location} with {region}, continueing with the next one')
+                        continue
+                    regions_for_this_outcome.append(region)
 
-            regional_exposure_df = exposure_df[
-                (exposure_df.chromosome.astype(str) == region.chromosome) &
-                (exposure_df.base_pair_location.astype(int) >= region.start) &
-                (exposure_df.base_pair_location.astype(int) <= region.end)
-                ].copy()
+                if len(regions_for_this_outcome):
+                    start = time.time()
+                    chunked_regions_per_outcome[outcome_location] = read_regions_from_file(
+                        outcome_location, regions_chunk)
+                    end = time.time()
+
+                    if True or verbosity:
+                        print(f'Read {outcome_location} {len(regions_chunk)} in {end - start:.2f}s')
+
+            """
+            And now to continue with the MR-link-2
+            """
+            for region in regions_chunk:
+                regional_exposure_df = exposure_df[
+                    (exposure_df.chromosome.astype(str) == region.chromosome) &
+                    (exposure_df.base_pair_location.astype(int) >= region.start) &
+                    (exposure_df.base_pair_location.astype(int) <= region.end)
+                    ].copy()
+
+                for outcome_location in sumstats_outcome:
+
+                    regional_results = None
+                    if (str(region), outcome_location) in outcome_region_combinations_already_done:
+                        print(f'Already done {outcome_location} on {region}, continueing with the next one')
+                        continue
+
+                    """
+                    Outcome summary statistics loading and parsing
+                    """
+                    outcome_df = chunked_regions_per_outcome[outcome_location]
+                    regional_outcome_df = outcome_df[
+                        (outcome_df.chromosome.astype(str) == region.chromosome) &
+                        (outcome_df.base_pair_location.astype(int) >= region.start) &
+                        (outcome_df.base_pair_location.astype(int) <= region.end)
+                        ].copy()
+
+                    regional_outcome_df = regional_outcome_df.rename(columns=original_input_to_gwas_catalog_dict)
+
+                    if len(set(outcome_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
+                        raise ValueError('Outcome summary statistics do not contain the necessary columns.\n'
+                                         f'The following columns should at least be present:\n{sumstats_necessary_colnames}\n'
+                                         f'The following columns are present: {outcome_df.columns}')
+                    if verbosity:
+                        print(f'before missingness filter: {regional_outcome_df.shape=}')
+                    regional_outcome_df = regional_outcome_df[regional_outcome_df.n >= (max_missingness * regional_outcome_df.n.max())]
+
+                    if not args.no_normalize_sumstats:
+                        regional_outcome_df['z'] = regional_outcome_df['beta'] / regional_outcome_df['standard_error']
+                        regional_outcome_df['beta'] = regional_outcome_df.z / np.sqrt(regional_outcome_df.n + regional_outcome_df.z ** 2)
+                        regional_outcome_df['standard_error'] = 1 / np.sqrt(regional_outcome_df.n + regional_outcome_df.z ** 2)
+
+                    if verbosity:
+                        print(f'after missingness filter: {regional_outcome_df.shape=}')
 
 
-            regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
-                                                                         regional_exposure_df.rsid,
-                                                                         maf_threshold=maf_threshold,
-                                                                         max_correlation=max_correlation,
-                                                                         )
-            snps_and_alleles_in_ld_matrix = [(x, plink_geno_obj.bim_data[x][2], plink_geno_obj.bim_data[x][3]) for x in
-                                             snps_in_ld_matrix]
 
-            try:
-                regional_results = mr_link2_on_region(region,
-                                                      exposure_df,
-                                                      outcome_df,
-                                                      reference_bed,
-                                                      maf_threshold,
-                                                      max_correlation,
-                                                      regional_ld_matrix,
-                                                      snps_alleles_in_ld_matrix=snps_and_alleles_in_ld_matrix,
-                                                      tmp_prepend=tmp_dir,
-                                                      verbosity=verbosity,
-                                                      var_explained_grid=var_explained_grid)
-            except Exception as x:
-                exceptions.append((region, x))
-                print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
-                continue
 
-            if regional_results is None:
-                exceptions.append((region, 'NONE_RESULT'))
-                print('Unable to identify mr-link2 results in {region} region')
-                continue
+                    regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
+                                                                                 regional_exposure_df.rsid,
+                                                                                 maf_threshold=maf_threshold,
+                                                                                 max_correlation=max_correlation,
+                                                                                 )
+                    snps_and_alleles_in_ld_matrix = [(x, plink_geno_obj.bim_data[x][2], plink_geno_obj.bim_data[x][3]) for x in
+                                                     snps_in_ld_matrix]
 
-            all_results.append(regional_results)
-            combined_df = pd.concat(all_results)
-            combined_df.to_csv(args.out + '_tmp', sep='\t', index=False)
+                    try:
+                        regional_results = mr_link2_on_region(region,
+                                                              regional_exposure_df,
+                                                              regional_outcome_df,
+                                                              reference_bed,
+                                                              maf_threshold,
+                                                              max_correlation,
+                                                              regional_ld_matrix,
+                                                              snps_alleles_in_ld_matrix=snps_and_alleles_in_ld_matrix,
+                                                              tmp_prepend=tmp_dir,
+                                                              verbosity=verbosity,
+                                                              var_explained_grid=var_explained_grid)
+                    except Exception as x:
+                        exceptions.append((region, x))
+                        print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
+                        continue
 
-        # write results
-        if len(all_results) != 0 and combined_df is not None:
-            combined_df.to_csv(args.out, sep='\t', index=False)
-            if os.path.exists(args.out + '_tmp'):
-                os.remove(args.out + '_tmp')
+                    if regional_results is None:
+                        exceptions.append((region, 'NONE_RESULT'))
+                        print(f'Unable to identify mr-link2 results in {region} region')
+                        continue
 
-        # write exceptions to a file
-        if len(exceptions) != 0:
-            with open(args.out + '_no_estimate', 'a') as f:
-                for region, exception in exceptions:
-                    f.write(f'{region}\t{exception}\n')
+                    regional_results['exposure_file'] = sumstats_exposure
+                    regional_results['outcome_file'] = outcome_location
 
-        # finally, clean up
-        for filename in files_to_remove:
-            if os.path.exists(filename):
-                os.remove(filename)
+                    all_results.append(regional_results)
+                    combined_df = pd.concat(all_results)
+                    combined_df.to_csv(args.out + '_tmp', sep='\t', index=False)
+
+            # write results
+            if len(all_results) != 0 and combined_df is not None:
+                combined_df.to_csv(args.out, sep='\t', index=False)
+                if os.path.exists(args.out + '_tmp'):
+                    os.remove(args.out + '_tmp')
+
+            # write exceptions to a file
+            if len(exceptions) != 0:
+                with open(args.out + '_no_estimate', 'a') as f:
+                    for region, exception in exceptions:
+                        f.write(f'{region}\t{exception}\n')
+
+            # finally, clean up
+            for filename in files_to_remove:
+                if os.path.exists(filename):
+                    os.remove(filename)
