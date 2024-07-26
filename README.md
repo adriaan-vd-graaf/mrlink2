@@ -99,8 +99,10 @@ options:
                         The plink bed file prepend of the genotype file that can be used as an LD reference. Usage is the same as in the plink --bed command
   --sumstats_exposure SUMSTATS_EXPOSURE
                         The summary statistics file of the exposure file. Please see the README file or the example_files folder for examples on how to make these files.
+  
   --sumstats_outcome SUMSTATS_OUTCOME
                         The summary statistics file of the outcome file. Please see the README file or the example_files folder for examples on how to make these files.
+                        We allow multiple outcomes to be analyzed at the same time, include the files separated by spaces
   --out OUT             The path where to output results
   --tmp TMP             Not necessary anymore: a prepend on where to save temporary files DEPRECATED
   --p_threshold P_THRESHOLD

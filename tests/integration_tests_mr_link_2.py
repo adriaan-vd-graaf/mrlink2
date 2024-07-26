@@ -219,3 +219,45 @@ def test_mr_link_2_integration_non_causal_gwas_catalog_format():
         assert np.isclose(data_frame['se(sigma_y)'], 0.0066189399600698)
         assert np.isclose(data_frame['p(sigma_y)'], 7.011323342257353e-136)
 
+
+
+
+def test_mr_link_2_integration_on_multiple_outcomes():
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_loc = f'{tmpdir}/tmp_integration_testing_'
+
+        command = [
+            sys.executable, f"{current_dir}/../mr_link_2_standalone.py",
+            "--reference_bed", f"{current_dir}/../example_files/reference_cohort",
+            "--sumstats_exposure", f"{current_dir}/../example_files/non_causal_exposure.txt",
+            "--sumstats_outcome",
+                f"{current_dir}/../example_files/gwas_catalog_format.txt",
+                f'{current_dir}/../example_files/yes_causal_outcome.txt',
+            "--out", f'{tmp_loc}_gwas_catalog_format_and_other.txt'
+        ]
+
+        result = subprocess.run(command, capture_output=True, text=True)
+        assert result.returncode == 0, f"Command failed with return code {result.returncode}. Output: {result.stdout} Error: {result.stderr}"
+
+        data_frame = pd.read_csv(f'{tmp_loc}_gwas_catalog_format_and_other.txt', sep='\t')
+
+        assert np.isclose(data_frame.alpha[0], -0.0330966574547156)
+        assert np.isclose(data_frame['se(alpha)'][0], 0.0529061811094349)
+        assert np.isclose(data_frame['p(alpha)'][0], 0.5315953131580522)
+
+        assert np.isclose(data_frame.sigma_x[0],0.5641943699065054)
+        assert np.isclose(data_frame.sigma_y[0], 0.1642151919013568)
+        assert np.isclose(data_frame['se(sigma_y)'][0], 0.0066189399600698)
+        assert np.isclose(data_frame['p(sigma_y)'][0], 7.011323342257353e-136)
+
+        ## Second outcome
+        assert np.isclose(data_frame.alpha[1], -0.1042118931465468)
+        assert np.isclose(data_frame['se(alpha)'][1], 0.0586538510326496)
+        assert np.isclose(data_frame['p(alpha)'][1], 0.0756131330132535)
+
+        assert np.isclose(data_frame.sigma_x[1],0.5655293785994038)
+        assert np.isclose(data_frame.sigma_y[1], 0.2337825514636705)
+        assert np.isclose(data_frame['se(sigma_y)'][1], 0.0053092285613672)
+        assert np.isclose(data_frame['p(sigma_y)'][1], 0.0)

@@ -1128,9 +1128,6 @@ def read_ld_matrix_local(geno_file_obj: PlinkGenoReader, list_of_snps, maf_thres
                             if not (bool_1 or bool_2)]
     ld_matrix = np.corrcoef(genotypes.T)
 
-    # Remove highly correlated, as it could be a source of eigenvalue non-convergence
-    idxs_to_remove = np.any(np.isnan(ld_matrix), axis=1)
-
     ld_matrix, ordered_snps = remove_highly_correlated(ld_matrix, overlapping_snps, max_correlation)
 
     return ld_matrix, ordered_snps
@@ -1180,8 +1177,8 @@ def read_ld_matrix_plink(bed_prepend, list_of_snps, maf_threshold, max_correlati
     for filename in files_to_remove:
         os.remove(filename)
 
-
     return correlation_mat, ordered_snps
+
 
 def remove_highly_correlated(ld_matrix, snp_ordering, max_correlation):
 
@@ -1231,6 +1228,10 @@ Pleiotropy robust cis Mendelian randomization
                         required=True,
                         help='The summary statistics file of the outcome file. Please see the README file or the\n'
                              'example_files folder for examples on how to make these files.'
+                             'You can specify more than one outcome per exposure',
+                        action='extend',
+                        nargs='+',
+                        type=str
                         )
     parser.add_argument('--out',
                         required=True,
@@ -1373,28 +1374,6 @@ Pleiotropy robust cis Mendelian randomization
             print(f'after missingness filter: {exposure_df.shape=}')
 
         """
-        Outcome summary statistics loading and parsing
-        """
-        outcome_df = pd.read_csv(sumstats_outcome, sep='\t')
-        outcome_df = outcome_df.rename(columns=original_input_to_gwas_catalog_dict)
-
-        if len(set(outcome_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
-            raise ValueError('Outcome summary statistics do not contain the necessary columns.\n'
-                             f'The following columns should at least be present:\n{sumstats_necessary_colnames}\n'
-                             f'The following columns are present: {outcome_df.columns}')
-        if verbosity:
-            print(f'before missingness filter: {outcome_df.shape=}')
-        outcome_df = outcome_df[outcome_df.n >= (max_missingness * outcome_df.n.max())]
-
-        if not args.no_normalize_sumstats:
-            outcome_df['z'] = outcome_df['beta'] / outcome_df['standard_error']
-            outcome_df['beta'] = outcome_df.z / np.sqrt(outcome_df.n + outcome_df.z ** 2)
-            outcome_df['standard_error'] = 1 / np.sqrt(outcome_df.n + outcome_df.z ** 2)
-
-        if verbosity:
-            print(f'after missingness filter: {outcome_df.shape=}')
-
-        """
         Perform clumping or use regions that were previously prespecified.
         """
 
@@ -1438,11 +1417,10 @@ Pleiotropy robust cis Mendelian randomization
         if verbosity:
             print(exposure_df.head())
 
-        if verbosity:
-            print(outcome_df.head())
+
 
         all_results = []
-        regions_already_done = []
+        outcome_region_combinations_already_done = []
         previously_done_df = pd.DataFrame()
 
         combined_df = None
@@ -1450,62 +1428,91 @@ Pleiotropy robust cis Mendelian randomization
         if args.continue_analysis:
             if os.path.exists(args.out + '_tmp'):
                 previously_done_df = pd.read_csv(args.out + '_tmp', sep='\t')
-                regions_already_done = set(previously_done_df.region.unique())
+                outcome_region_combinations_already_done = set(zip(previously_done_df.region, previously_done_df.outcome_file))
 
             elif os.path.exists(args.out):
                 previously_done_df = pd.read_csv(args.out, sep='\t')
-                regions_already_done = set(previously_done_df.region.unique())
+                outcome_region_combinations_already_done = set(zip(previously_done_df.region, previously_done_df.outcome_file))
 
             all_results.append(previously_done_df)
             combined_df = pd.concat(all_results)
 
         exceptions = []
         for region in regions_to_do:
-            regional_results = None
-            if str(region) in regions_already_done:
-                print(f'Already done {region}, continueing with the next one')
-                continue
-
             regional_exposure_df = exposure_df[
                 (exposure_df.chromosome.astype(str) == region.chromosome) &
                 (exposure_df.base_pair_location.astype(int) >= region.start) &
                 (exposure_df.base_pair_location.astype(int) <= region.end)
                 ].copy()
 
+            for outcome_location in sumstats_outcome:
 
-            regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
-                                                                         regional_exposure_df.rsid,
-                                                                         maf_threshold=maf_threshold,
-                                                                         max_correlation=max_correlation,
-                                                                         )
-            snps_and_alleles_in_ld_matrix = [(x, plink_geno_obj.bim_data[x][2], plink_geno_obj.bim_data[x][3]) for x in
-                                             snps_in_ld_matrix]
+                regional_results = None
+                if (str(region), outcome_location) in outcome_region_combinations_already_done:
+                    print(f'Already done {outcome_location} on {region}, continueing with the next one')
+                    continue
 
-            try:
-                regional_results = mr_link2_on_region(region,
-                                                      exposure_df,
-                                                      outcome_df,
-                                                      reference_bed,
-                                                      maf_threshold,
-                                                      max_correlation,
-                                                      regional_ld_matrix,
-                                                      snps_alleles_in_ld_matrix=snps_and_alleles_in_ld_matrix,
-                                                      tmp_prepend=tmp_dir,
-                                                      verbosity=verbosity,
-                                                      var_explained_grid=var_explained_grid)
-            except Exception as x:
-                exceptions.append((region, x))
-                print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
-                continue
+                """
+                Outcome summary statistics loading and parsing
+                """
+                outcome_df = pd.read_csv(outcome_location, sep='\t')
+                outcome_df = outcome_df.rename(columns=original_input_to_gwas_catalog_dict)
 
-            if regional_results is None:
-                exceptions.append((region, 'NONE_RESULT'))
-                print('Unable to identify mr-link2 results in {region} region')
-                continue
+                if len(set(outcome_df.columns) & sumstats_necessary_colnames) != len(sumstats_necessary_colnames):
+                    raise ValueError('Outcome summary statistics do not contain the necessary columns.\n'
+                                     f'The following columns should at least be present:\n{sumstats_necessary_colnames}\n'
+                                     f'The following columns are present: {outcome_df.columns}')
+                if verbosity:
+                    print(f'before missingness filter: {outcome_df.shape=}')
+                outcome_df = outcome_df[outcome_df.n >= (max_missingness * outcome_df.n.max())]
 
-            all_results.append(regional_results)
-            combined_df = pd.concat(all_results)
-            combined_df.to_csv(args.out + '_tmp', sep='\t', index=False)
+                if not args.no_normalize_sumstats:
+                    outcome_df['z'] = outcome_df['beta'] / outcome_df['standard_error']
+                    outcome_df['beta'] = outcome_df.z / np.sqrt(outcome_df.n + outcome_df.z ** 2)
+                    outcome_df['standard_error'] = 1 / np.sqrt(outcome_df.n + outcome_df.z ** 2)
+
+                if verbosity:
+                    print(f'after missingness filter: {outcome_df.shape=}')
+
+
+
+
+                regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
+                                                                             regional_exposure_df.rsid,
+                                                                             maf_threshold=maf_threshold,
+                                                                             max_correlation=max_correlation,
+                                                                             )
+                snps_and_alleles_in_ld_matrix = [(x, plink_geno_obj.bim_data[x][2], plink_geno_obj.bim_data[x][3]) for x in
+                                                 snps_in_ld_matrix]
+
+                try:
+                    regional_results = mr_link2_on_region(region,
+                                                          regional_exposure_df,
+                                                          outcome_df,
+                                                          reference_bed,
+                                                          maf_threshold,
+                                                          max_correlation,
+                                                          regional_ld_matrix,
+                                                          snps_alleles_in_ld_matrix=snps_and_alleles_in_ld_matrix,
+                                                          tmp_prepend=tmp_dir,
+                                                          verbosity=verbosity,
+                                                          var_explained_grid=var_explained_grid)
+                except Exception as x:
+                    exceptions.append((region, x))
+                    print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
+                    continue
+
+                if regional_results is None:
+                    exceptions.append((region, 'NONE_RESULT'))
+                    print('Unable to identify mr-link2 results in {region} region')
+                    continue
+
+                regional_results['exposure_file'] = sumstats_exposure
+                regional_results['outcome_file'] = outcome_location
+
+                all_results.append(regional_results)
+                combined_df = pd.concat(all_results)
+                combined_df.to_csv(args.out + '_tmp', sep='\t', index=False)
 
         # write results
         if len(all_results) != 0 and combined_df is not None:
