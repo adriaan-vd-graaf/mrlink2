@@ -1438,7 +1438,7 @@ Pleiotropy robust cis Mendelian randomization
 
         if verbosity:
             print(f'before missingness filter: {exposure_df.shape=}')
-        exposure_df = exposure_df[exposure_df.n >= (max_missingness * exposure_df.n.max())]
+
 
         if not args.no_normalize_sumstats:
             exposure_df['z'] = exposure_df['beta'] / exposure_df['standard_error']
@@ -1562,6 +1562,12 @@ Pleiotropy robust cis Mendelian randomization
                     (exposure_df.base_pair_location.astype(int) >= region.start) &
                     (exposure_df.base_pair_location.astype(int) <= region.end)
                     ].copy()
+
+
+                regional_exposure_df = regional_exposure_df[regional_exposure_df.n >= (max_missingness * regional_exposure_df.n.max())]
+                if verbosity:
+                    print(f'after missingness filter for {region}: {exposure_df.shape=}')
+
 
                 for outcome_location in sumstats_outcome:
 
