@@ -235,7 +235,8 @@ def test_mr_link_2_integration_on_multiple_outcomes():
             "--sumstats_outcome",
                 f"{current_dir}/../example_files/gwas_catalog_format.txt",
                 f'{current_dir}/../example_files/yes_causal_outcome.txt',
-            "--out", f'{tmp_loc}_gwas_catalog_format_and_other.txt'
+            "--out", f'{tmp_loc}_gwas_catalog_format_and_other.txt',
+            "--verbose", '1',
         ]
 
         result = subprocess.run(command, capture_output=True, text=True)
