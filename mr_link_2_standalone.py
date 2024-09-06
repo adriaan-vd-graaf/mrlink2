@@ -1347,8 +1347,10 @@ def read_ld_matrix_local(geno_file_obj: PlinkGenoReader, list_of_snps, maf_thres
     if genotypes.shape[1] == 0 or ld_matrix.shape[0] == 0:
         return None, None
 
-    ld_matrix, ordered_snps = remove_highly_correlated(ld_matrix, genotype_matrix_snps, max_correlation)
-
+    try:
+        ld_matrix, ordered_snps = remove_highly_correlated(ld_matrix, genotype_matrix_snps, max_correlation)
+    except:
+        return None, None
 
     return ld_matrix, ordered_snps
 
