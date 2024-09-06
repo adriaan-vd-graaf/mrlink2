@@ -1344,7 +1344,7 @@ def read_ld_matrix_local(geno_file_obj: PlinkGenoReader, list_of_snps, maf_thres
     ld_matrix = np.corrcoef(genotypes.T)
 
     # it can happen that there are no SNPs available after this filter , we return None.
-    if genotypes.shape[1] == 0:
+    if genotypes.shape[0] == 0:
         return None, None
 
     ld_matrix, ordered_snps = remove_highly_correlated(ld_matrix, genotype_matrix_snps, max_correlation)
@@ -1782,7 +1782,7 @@ Pleiotropy robust cis Mendelian randomization
 
                 regional_exposure_df = regional_exposure_df[regional_exposure_df.n >= (max_missingness * regional_exposure_df.n.max())]
                 if verbosity:
-                    print(f'after missingness filter for {region}: {exposure_df.shape=}')
+                    print(f'after missingness filter for {region}: {regional_exposure_df.shape=}')
 
                 regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
                                                                              regional_exposure_df.rsid,
