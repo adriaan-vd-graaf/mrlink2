@@ -1343,6 +1343,10 @@ def read_ld_matrix_local(geno_file_obj: PlinkGenoReader, list_of_snps, maf_thres
                             if not (bool_1 or bool_2)]
     ld_matrix = np.corrcoef(genotypes.T)
 
+    # it can happen that there are no SNPs available after this filter , we return None.
+    if genotypes.shape[1] == 0:
+        return None, None
+
     ld_matrix, ordered_snps = remove_highly_correlated(ld_matrix, genotype_matrix_snps, max_correlation)
 
     return ld_matrix, ordered_snps
@@ -1780,6 +1784,19 @@ Pleiotropy robust cis Mendelian randomization
                 if verbosity:
                     print(f'after missingness filter for {region}: {exposure_df.shape=}')
 
+                regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
+                                                                             regional_exposure_df.rsid,
+                                                                             maf_threshold=maf_threshold,
+                                                                             max_correlation=max_correlation,
+                                                                             )
+                if regional_ld_matrix is None:
+                    exceptions.append((region, 'NO_SNPS_IN_LD_MATRIX'))
+                    print(f'Unable to identify mr-link2 results in {region} region due to no SNPs in the LD matrix')
+                    continue
+
+                snps_and_alleles_in_ld_matrix = [(x, plink_geno_obj.bim_data[x][2], plink_geno_obj.bim_data[x][3]) for x
+                                                 in
+                                                 snps_in_ld_matrix]
 
                 for outcome_location in sumstats_outcome:
 
@@ -1816,16 +1833,6 @@ Pleiotropy robust cis Mendelian randomization
                     if verbosity:
                         print(f'after missingness filter: {regional_outcome_df.shape=}')
 
-
-
-
-                    regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
-                                                                                 regional_exposure_df.rsid,
-                                                                                 maf_threshold=maf_threshold,
-                                                                                 max_correlation=max_correlation,
-                                                                                 )
-                    snps_and_alleles_in_ld_matrix = [(x, plink_geno_obj.bim_data[x][2], plink_geno_obj.bim_data[x][3]) for x in
-                                                     snps_in_ld_matrix]
 
                     try:
                         regional_results = mr_link2_on_region(region,

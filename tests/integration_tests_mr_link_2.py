@@ -190,6 +190,31 @@ def test_mr_link_2_integration_non_causal():
         assert np.isclose(data_frame['p(sigma_y)'], 7.011323342257353e-136)
 
 
+def test_mr_link_2_integration_no_snps_in_region():
+
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        tmp_loc = f'{tmpdir}/tmp_integration_testing_'
+
+        command = [
+            sys.executable, f"{current_dir}/../mr_link_2_standalone.py",
+            "--prespecified_regions", "2:102049932-102051291", # selecting a SNP here with AF 0.16
+            "--maf_threshold", "0.3", ## this will remove the low MAF SNP, and cause the error
+            "--reference_bed", f"{current_dir}/../example_files/reference_cohort",
+            "--sumstats_exposure", f"{current_dir}/../example_files/non_causal_exposure.txt",
+            "--sumstats_outcome", f"{current_dir}/../example_files/non_causal_outcome.txt",
+            "--out", f'{tmp_loc}non_causal.txt'
+        ]
+
+        result = subprocess.run(command, capture_output=True, text=True)
+        # data_frame = pd.read_csv(f'{tmp_loc}non_causal.txt', sep='\t')
+
+        error_string = f'Unable to identify mr-link2 results in 2:102049932-102051291 region due to no SNPs in the LD matrix'
+        assert error_string in result.stdout
+
+
+
+
 def test_mr_link_2_integration_non_causal_gwas_catalog_format():
 
     current_dir = os.path.dirname(os.path.abspath(__file__))
