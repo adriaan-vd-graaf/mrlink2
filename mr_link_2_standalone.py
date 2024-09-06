@@ -1344,7 +1344,7 @@ def read_ld_matrix_local(geno_file_obj: PlinkGenoReader, list_of_snps, maf_thres
     ld_matrix = np.corrcoef(genotypes.T)
 
     # it can happen that there are no SNPs available after this filter , we return None.
-    if genotypes.shape[1] == 0 or ld_matrix.shape[0] == 0:
+    if genotypes.shape[1] == 0:
         return None, None
 
     try:
