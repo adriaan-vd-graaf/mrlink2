@@ -1593,6 +1593,13 @@ Pleiotropy robust cis Mendelian randomization
                              'to remove winners curse.'
                         )
 
+    parser.add_argument('--max_snps_in_correlation_matrix',
+                        required=False,
+                        default=5250,
+                        help='How many SNPs are allowed in the correlation matrix, as it can take a lot of time to '
+                             'Do the eigendecompositions and Rscripts otherwise.'
+                        )
+
     parser.add_argument('--verbose',
                         default=0,
                         help='Set to 1 if you want to read more output, for debugging purposes ')
@@ -1610,7 +1617,10 @@ Pleiotropy robust cis Mendelian randomization
     maf_threshold = float(args.maf_threshold)
     max_correlation = float(args.max_correlation)
 
+    max_correlation_matrix_snps = int(args.max_snps_in_correlation_matrix)
+
     read_chunk = int(args.regions_to_read_at_the_same_time)
+
 
     max_missingness = float(args.max_missingness)
     if 0.0 > max_missingness > 1.0:
@@ -1848,7 +1858,8 @@ Pleiotropy robust cis Mendelian randomization
                                                               snps_alleles_in_ld_matrix=snps_and_alleles_in_ld_matrix,
                                                               tmp_prepend=tmp_dir,
                                                               verbosity=verbosity,
-                                                              var_explained_grid=var_explained_grid)
+                                                              var_explained_grid=var_explained_grid,
+                                                              max_snp_threshold=max_correlation_matrix_snps)
                     except Exception as x:
                         exceptions.append((region, x))
                         print(f'Unable to make an MR-link2 estimate in {region} due to {x}')

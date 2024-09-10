@@ -134,6 +134,11 @@ options:
                         in one discovery cohort, and assess the MR effect in a different cohort. 
                         This is a scenario for instance to remove winners curse.
 
+  --max_snps_in_correlation_matrix
+                        How many SNPs are allowed in the correlation matrix, as it can take a lot of time to 
+                        do the eigendecompositions and Rscripts otherwise.
+                        default: 5250
+
   --no_normalize_sumstats
                         flag to _not_ normalize summary statistics
   --no_exclude_hla      
