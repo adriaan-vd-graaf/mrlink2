@@ -1883,16 +1883,16 @@ Pleiotropy robust cis Mendelian randomization
                     combined_df = pd.concat(all_results)
                     combined_df.to_csv(args.out + '_tmp', sep='\t', index=False)
 
-            # write exceptions to a file
-            if len(exceptions) != 0:
-                with open(args.out + '_no_estimate', 'a') as f:
-                    for region, exception in exceptions:
-                        f.write(f'{region}\t{exception}\n')
+                # write exceptions to a file
+                if len(exceptions) != 0:
+                    with open(args.out + '_no_estimate', 'a') as f:
+                        for region, exception in exceptions:
+                            f.write(f'{region}\t{exception}\n')
 
-            # finally, clean up
-            for filename in files_to_remove:
-                if os.path.exists(filename):
-                    os.remove(filename)
+        # finally, clean up
+        for filename in files_to_remove:
+            if os.path.exists(filename):
+                os.remove(filename)
 
         # Finally, write results to txt.
         if len(all_results) != 0 and combined_df is not None:
