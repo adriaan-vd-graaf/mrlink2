@@ -411,7 +411,6 @@ if __name__ == '__main__':
 
     full_df = pd.concat(all_dfs)
 
-
     # Check if the folder exists, if not, create it
     if not os.path.exists(folder_path):
         os.makedirs(folder_path)
