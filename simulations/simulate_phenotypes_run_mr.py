@@ -6,6 +6,7 @@ import scipy.io
 import pandas as pd
 import os
 
+
 def select_causal_snps(exposure_1_n_causal, exposure_2_n_causal,
                        overlapping_causal_snps, ld_mat,
                        n_reps,
@@ -389,7 +390,6 @@ if __name__ == '__main__':
     mafs = np.asarray([0.5] * m_snps)
 
     all_dfs = []
-
 
     for i_pheno in range(bXs.shape[1]):
         exp_tmp_df = pd.DataFrame()
