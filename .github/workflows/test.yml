@@ -43,3 +43,6 @@ jobs:
 
       - name: Run integration tests
         run: pytest tests/integration_tests_mr_link_2.py
+
+      - name: Run comparison_tests_with_r_imlementation
+        run: pytest tests/test_for_r_and_python_concordance.py
