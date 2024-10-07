@@ -81,7 +81,7 @@ mr_link2 <- function(selected_eigenvalues, selected_eigenvectors,
 
   # Define optimization options
   method <- "Nelder-Mead"
-  control <- list(maxit = 100000)
+  control <- list(maxit = 300)
 
   # Calculate c_x and c_y
   c_x <- t(selected_eigenvectors) %*% exposure_betas
@@ -207,4 +207,83 @@ mr_link2 <- function(selected_eigenvalues, selected_eigenvectors,
     optim_ha_nit = ha_results$counts,
     function_time = as.numeric(difftime(Sys.time(), start_time, units = "secs"))
   )
+}
+
+remove_highly_correlated <- function(ld_matrix, snp_ordering, max_correlation) {
+  # Remove NAs from the correlation matrix
+  ld_matrix[is.na(ld_matrix)] <- 0
+
+  # Initialize a logical vector to mark rows/columns to remove
+  idxs_to_remove <- rep(FALSE, nrow(ld_matrix))
+
+  # Find pairs of SNPs that are highly correlated
+  correlated_indices <- which(abs(ld_matrix) >= max_correlation, arr.ind = TRUE)
+
+  to_remove <- vector("logical", length = nrow(ld_matrix))
+
+  # Loop through correlated pairs and mark SNPs to remove
+  for (i in seq_len(nrow(correlated_indices))) {
+    a <- correlated_indices[i, 1]
+    b <- correlated_indices[i, 2]
+
+    if ((!to_remove[a] && !to_remove[b] ) && (a != b)) {
+      to_remove[b] <- TRUE
+    }
+  }
+
+  # Remove highly correlated SNPs from both the matrix and the SNP list
+  ld_matrix <- ld_matrix[!to_remove, !to_remove]
+  pruned_snps <- snp_ordering[!to_remove]
+
+  return(list(ld_matrix = ld_matrix, pruned_snps = pruned_snps))
+}
+
+mr_link2_analysis <- function(exposure_betas, outcome_betas, ld_matrix, n_exp, n_out, max_correlation = 0.99) {
+  # Prune highly correlated SNPs
+  snp_ordering <- seq_len(nrow(ld_matrix))  # Simple numbering for SNPs
+  pruned_data <- remove_highly_correlated(ld_matrix, snp_ordering, max_correlation)
+  pruned_ld_matrix <- pruned_data$ld_matrix
+  pruned_snps <- pruned_data$pruned_snps
+
+  # Eigenvalue decomposition
+  eigen_decomp <- eigen(pruned_ld_matrix)
+  eigenvalues <- eigen_decomp$values
+  eigenvectors <- eigen_decomp$vectors
+
+  # Calculate cumulative variance explained
+  variance_explained <- cumsum(eigenvalues) / sum(eigenvalues)
+
+  # Select the eigenvectors that explain at least 99% of the variance
+  threshold_index <- min(which(variance_explained >= 0.99))
+  selected_eigenvectors <- eigenvectors[, 1:threshold_index]
+  selected_eigenvalues <- eigenvalues[1:threshold_index]
+
+  # Call the existing MR-link-2 function
+  # Assuming `mr_link2` is already defined in R and takes the following arguments:
+  # - selected_eigenvalues
+  # - selected_eigenvectors
+  # - exposure_betas
+  # - outcome_betas
+  # - n_exp (number of individuals in exposure dataset)
+  # - n_out (number of individuals in outcome dataset)
+  sigma_exp_guess <- 0.01  # You can adjust or estimate this as needed
+  sigma_out_guess <- 0.001  # You can adjust or estimate this as needed
+
+  # Subset the betas based on pruned SNPs
+  exposure_betas_pruned <- exposure_betas[pruned_snps]
+  outcome_betas_pruned <- outcome_betas[pruned_snps]
+
+  # Perform the MR-link-2 estimation
+  mr_result <- mr_link2(
+    selected_eigenvalues = selected_eigenvalues,
+    selected_eigenvectors = selected_eigenvectors,
+    exposure_betas = exposure_betas_pruned,
+    outcome_betas = outcome_betas_pruned,
+    n_exp = n_exp,
+    n_out = n_out,
+    sigma_exp_guess = sigma_exp_guess,
+    sigma_out_guess = sigma_out_guess
+  )
+
+  return(mr_result)
 }

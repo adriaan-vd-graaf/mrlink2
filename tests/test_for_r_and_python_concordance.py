@@ -11,7 +11,8 @@ from mr_link_2_standalone import *
 ## for the R part
 
 from rpy2.robjects import r, numpy2ri, default_converter
-from rpy2.robjects.vectors import FloatVector
+from rpy2.robjects.vectors import FloatVector, ListVector, StrVector
+
 from rpy2.robjects.packages import importr
 from rpy2.robjects.conversion import localconverter
 
@@ -22,7 +23,7 @@ numpy2ri.activate()
 # Load the base R package
 base = importr('base')
 # Source the R file with the functions
-r['source']('../R/mr_link_2_functions.R')
+r['source'](os.path.abspath(os.path.join(os.path.dirname(__file__), '..',  'R', 'mr_link_2_functions.R')))
 
 """
 Now, we perform unit tests on the MR-link-2 functions. to ensure that there is no creep of the 
@@ -423,3 +424,84 @@ def test_mr_link2_equivalence_fuzz(selected_eigenvalues, selected_eigenvectors, 
     for key in low_precision_keys:
         assert np.isclose(python_result[key], r_result_dict[key], rtol=2.5e-2, ## this is pretty suboptimal, but as this also includes P values, there will not be a crazy amount of difference here.
                           atol=1e-8), f"Mismatch for {key}: Python={python_result[key]}, R={r_result_dict[key]}"
+
+
+def test_remove_highly_correlated():
+    """Test that the highly correlated SNPs are correctly removed."""
+
+    # Example LD matrix with correlation values
+    ld_matrix = np.array([[1.0, 0.9, 0.1],
+                          [0.9, 1.0, 0.05],
+                          [0.1, 0.05, 1.0]])
+
+    snp_ordering = ["SNP1", "SNP2", "SNP3"]
+    max_correlation = 0.8  # Set the maximum correlation threshold
+
+    with localconverter(numpy2ri.converter):
+        r_ld_matrix = r.matrix(ld_matrix, nrow=3)
+        # Wrap the snp_ordering list into a dictionary format for ListVector
+        r_snp_ordering = StrVector(snp_ordering)
+
+        # Call the R function `remove_highly_correlated`
+        r_pruned_result = r['remove_highly_correlated'](r_ld_matrix, r_snp_ordering, max_correlation)
+
+    # Extract results from R output
+    pruned_ld_matrix = np.array(r_pruned_result['ld_matrix'])
+    pruned_snps = list(r_pruned_result['pruned_snps'])
+
+    # Expected pruned results (SNP2 is removed)
+    expected_pruned_ld_matrix = np.array([[1.0, 0.05], [0.05, 1.0]])
+    expected_pruned_snps = ["SNP2", "SNP3"]
+
+    # Assertions
+    assert np.allclose(pruned_ld_matrix, expected_pruned_ld_matrix), "LD matrix was not pruned correctly."
+    assert pruned_snps == expected_pruned_snps, f"SNP pruning failed. Expected {expected_pruned_snps}, got {pruned_snps}"
+
+# Test function for eigenvalue decomposition and MR-link-2 analysis
+def test_mr_link2_analysis():
+    """Test the MR-link-2 analysis on synthetic data."""
+
+    # Synthetic data
+    np.random.seed(42)
+    exposure_betas = np.random.normal(size=100)
+    outcome_betas = np.random.normal(size=100)
+    ld_matrix = np.random.normal(0, 1, (100, 100))
+    ld_matrix = (ld_matrix + ld_matrix.T) / 2  # Make it symmetric
+    np.fill_diagonal(ld_matrix, 1)  # Ensure diagonals are 1s (perfect correlation with self)
+
+    n_exp = 1000
+    n_out = 1000
+    max_correlation = 0.9
+
+    # Convert inputs to R-compatible types
+    with localconverter(numpy2ri.converter):
+        r_exposure_betas = FloatVector(exposure_betas)
+        r_outcome_betas = FloatVector(outcome_betas)
+        r_ld_matrix = r.matrix(ld_matrix, nrow=100)
+        r_n_exp = n_exp
+        r_n_out = n_out
+        r_max_correlation = max_correlation
+
+        # Call the R function `mr_link2_analysis`
+        r_mr_result = r['mr_link2_analysis'](r_exposure_betas, r_outcome_betas, r_ld_matrix, r_n_exp, r_n_out,
+                                             r_max_correlation)
+
+    # Convert the result back to a Python-friendly format
+    mr_result_dict = dict(r_mr_result)
+
+    # Check the output has expected keys and ranges
+    assert 'alpha' in mr_result_dict, "Key 'alpha' missing in MR result."
+    assert 'p(alpha)' in mr_result_dict, "Key 'p(alpha)' missing in MR result."
+    assert 'sigma_x' in mr_result_dict, "Key 'sigma_x' missing in MR result."
+
+    # Example value checks (can be replaced with actual expected ranges based on real data)
+    assert np.isfinite(mr_result_dict['alpha']), "Alpha value is not finite."
+    assert 0 <= mr_result_dict['p(alpha)'] <= 1, "P-value for alpha is out of bounds."
+    assert mr_result_dict['sigma_x'] > 0, "Sigma_x should be positive."
+
+    print("MR-link-2 result passed all checks.")
+
+
+# Run the tests
+if __name__ == '__main__':
+    pytest.main()
