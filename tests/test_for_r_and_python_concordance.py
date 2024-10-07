@@ -312,3 +312,19 @@ def test_fuzz_mr_link2_loglik_alpha_h0(th, lam, cX, cY, nX, nY):
     # Compare both results using np.isclose()
     assert np.isclose(python_result, r_result_py, rtol=1e-5,
                       atol=1e-8), f"Mismatch for th={th}, lam={lam}, cX={cX}, cY={cY}, nX={nX}, nY={nY}"
+
+
+
+@pytest.mark.parametrize("th, lam, cX, cY, nX, nY", [
+    (np.array([1e-10, 1e-10, 1e-10]), np.array([1e-10, 1e-10, 1e-10]), np.array([1e-10, 1e-10, 1e-10]), np.array([1e-10, 1e-10, 1e-10]), 1e10, 1e10),
+    (np.array([1e10, 1e10, 1e10]), np.array([1e5, 1e5, 1e5]), np.array([1e2, 1e2, 1e2]), np.array([1e2, 1e2, 1e2]), 1e10, 1e5),
+    (np.array([0, 0, 0]), np.array([1, 2, 3]), np.array([0, 0, 0]), np.array([0, 0, 0]), 100, 100),
+    # Add other extreme cases here...
+])
+def test_edge_cases_mr_link2_loglik_reference_v2(th, lam, cX, cY, nX, nY):
+    """Test edge cases for equivalence between Python and R implementations."""
+    python_result = mr_link2_loglik_reference_v2(th, lam, cX, cY, nX, nY)
+    r_result = r['mr_link2_loglik_reference_v2'](th, lam, cX, cY, nX, nY)
+    r_result_py = float(r_result[0])
+
+    assert np.isclose(python_result, r_result_py, rtol=1e-5, atol=1e-8)
