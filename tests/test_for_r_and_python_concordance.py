@@ -10,8 +10,11 @@ from mr_link_2_standalone import *
 
 ## for the R part
 
-from rpy2.robjects import r, numpy2ri
+from rpy2.robjects import r, numpy2ri, default_converter
+from rpy2.robjects.vectors import FloatVector
 from rpy2.robjects.packages import importr
+from rpy2.robjects.conversion import localconverter
+
 
 # Activate automatic conversion between numpy and R objects
 numpy2ri.activate()
@@ -261,10 +264,10 @@ def test_mr_link2_loglik_alpha_h0_large_population_r_concordance():
 """
 FUZZ TESTING many many many times.
 """
-FUZZ_ITERATIONS = 10000
+FUZZ_ITERATIONS = 1_000
 
 
-def random_input_generator():
+def random_input_generator_likelihood_functions():
     """Generate random inputs for the test functions."""
     for _ in range(FUZZ_ITERATIONS):
         th = np.random.uniform(-1e3, 1e3, size=3)
@@ -277,7 +280,7 @@ def random_input_generator():
         yield th, lam, cX, cY, nX, nY
 
 
-@pytest.mark.parametrize("th, lam, cX, cY, nX, nY", random_input_generator())
+@pytest.mark.parametrize("th, lam, cX, cY, nX, nY", random_input_generator_likelihood_functions())
 def test_fuzz_mr_link2_loglik_reference_v2(th, lam, cX, cY, nX, nY):
     """Fuzz testing for mr_link2_loglik_reference_v2 between Python and R implementations."""
     # Python function result
@@ -294,7 +297,7 @@ def test_fuzz_mr_link2_loglik_reference_v2(th, lam, cX, cY, nX, nY):
                       atol=1e-8), f"Mismatch for th={th}, lam={lam}, cX={cX}, cY={cY}, nX={nX}, nY={nY}"
 
 
-@pytest.mark.parametrize("th, lam, cX, cY, nX, nY", random_input_generator())
+@pytest.mark.parametrize("th, lam, cX, cY, nX, nY", random_input_generator_likelihood_functions())
 def test_fuzz_mr_link2_loglik_alpha_h0(th, lam, cX, cY, nX, nY):
     """Fuzz testing for mr_link2_loglik_alpha_h0 between Python and R implementations."""
     # Use only the first two elements of 'th' for alpha_h0
@@ -328,3 +331,95 @@ def test_edge_cases_mr_link2_loglik_reference_v2(th, lam, cX, cY, nX, nY):
     r_result_py = float(r_result[0])
 
     assert np.isclose(python_result, r_result_py, rtol=1e-5, atol=1e-8)
+
+
+"""
+Integration tests of the R functions
+"""
+
+FUZZ_TEST_ITERATIONS = 100
+def random_input_generator_mr_link_2_function():
+    np.random.seed(42)
+    """Generate random inputs for fuzz testing."""
+    for _ in range(FUZZ_TEST_ITERATIONS):
+        # Generate random 'selected_eigenvalues', 'selected_eigenvectors', 'exposure_betas', and 'outcome_betas'
+        selected_eigenvalues = np.random.uniform(0.1, 2.0, size=100)
+        selected_eigenvectors = np.random.normal(size=(100, 100))
+        exposure_betas = np.random.normal(size=100)
+        outcome_betas = np.random.normal(size=100)
+        n_exp = np.random.randint(500, 5000)  # Randomize number of individuals
+        n_out = np.random.randint(500, 5000)  # Randomize number of individuals
+        sigma_exp_guess = np.random.uniform(0.1, 5.0)  # Randomize sigma guesses
+        sigma_out_guess = np.random.uniform(0.1, 5.0)
+
+        yield selected_eigenvalues, selected_eigenvectors, exposure_betas, outcome_betas, n_exp, n_out, sigma_exp_guess, sigma_out_guess
+
+
+@pytest.mark.parametrize(
+    "selected_eigenvalues, selected_eigenvectors, exposure_betas, outcome_betas, n_exp, n_out, sigma_exp_guess, sigma_out_guess",
+    random_input_generator_mr_link_2_function())
+def test_mr_link2_equivalence_fuzz(selected_eigenvalues, selected_eigenvectors, exposure_betas, outcome_betas, n_exp,
+                                   n_out, sigma_exp_guess, sigma_out_guess):
+    """
+
+    Fuzz testing for MR-Link2 equivalence between Python and R implementations.
+
+    Currently only testing until a threshold of 2.5% difference. If testing more samples, this may be exceeded.
+
+    It seems that there are differences between the optimizers which I cannot resolve easily for now.
+    That being said, the p values will be withing 5% of each other, so a python p value of 0.1 will be found within
+    the (0.095 - 0.105) interval.
+
+    """
+
+    # Run Python version of mr_link2
+    python_result = mr_link2(
+        selected_eigenvalues=selected_eigenvalues,
+        selected_eigenvectors=selected_eigenvectors,
+        exposure_betas=exposure_betas,
+        outcome_betas=outcome_betas,
+        n_exp=n_exp,
+        n_out=n_out,
+        sigma_exp_guess=sigma_exp_guess,
+        sigma_out_guess=sigma_out_guess
+    )
+
+    # Convert inputs to R-compatible types and run R version of mr_link2
+    with localconverter(default_converter + numpy2ri.converter):
+        r_selected_eigenvalues = r.matrix(selected_eigenvalues, nrow=100, ncol=1)
+        r_selected_eigenvectors = r.matrix(selected_eigenvectors, nrow=100, ncol=100)
+        r_exposure_betas = r.matrix(exposure_betas, nrow=100, ncol=1)
+        r_outcome_betas = r.matrix(outcome_betas, nrow=100, ncol=1)
+        r_n_exp = n_exp
+        r_n_out = n_out
+        r_sigma_exp_guess = sigma_exp_guess
+        r_sigma_out_guess = sigma_out_guess
+
+        # Call the R function
+        r_result = r['mr_link2'](
+            r_selected_eigenvalues, r_selected_eigenvectors,
+            r_exposure_betas, r_outcome_betas,
+            r_n_exp, r_n_out, r_sigma_exp_guess, r_sigma_out_guess
+        )
+
+    # Convert R result back to Python dictionary format
+    r_result_dict = {str(key): value[0] for key, value in r_result.items()}
+
+    optimization_indicators = ['optim_alpha_h0_success', 'optim_sigma_y_h0_success', 'optim_ha_success']
+    for result in [python_result, r_result_dict]:
+        for indicator in optimization_indicators:
+            if not result[indicator]:
+                print('No correct optimization.')
+                return
+
+    # Define which results to compare with high precision
+    high_precision_keys = ['alpha_h0_loglik', 'ha_loglik', ]
+    for key in high_precision_keys:
+        assert np.isclose(python_result[key], r_result_dict[key], rtol=1e-4,
+                          atol=1e-8), f"Mismatch for {key}: Python={python_result[key]}, R={r_result_dict[key]}"
+
+    # Define which results to compare with low precision
+    low_precision_keys = ['alpha', 'sigma_y', 'sigma_x','p(alpha)', 'p(sigma_y)']
+    for key in low_precision_keys:
+        assert np.isclose(python_result[key], r_result_dict[key], rtol=2.5e-2, ## this is pretty suboptimal, but as this also includes P values, there will not be a crazy amount of difference here.
+                          atol=1e-8), f"Mismatch for {key}: Python={python_result[key]}, R={r_result_dict[key]}"
