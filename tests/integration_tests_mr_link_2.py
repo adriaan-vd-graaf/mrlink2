@@ -13,11 +13,6 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 from mr_link_2_standalone import *
 
 
-""""
-NB. These tests require us to have plink in your path. 
-So unfortunately I will not test them in the github workflow.
-"""
-
 def test_plink_version():
     result = subprocess.run(['plink', '--version'], capture_output=True, text=True)
     assert result.returncode == 0, "PLINK is not installed or not in the PATH"
