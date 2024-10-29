@@ -98,7 +98,7 @@ class PlinkGenoReader:
         for i in range(n_variants):
             bits = bitarray.bitarray(endian="little")
             bits.frombytes(byte_array[offset:(offset+bytes_per_variant)])
-            array = bits.decode(self._decoder)[:self.n_individuals]
+            array = list(bits.decode(self._decoder))[:self.n_individuals]
             genotypes[:,i] = array
             offset+=bytes_per_variant
 
