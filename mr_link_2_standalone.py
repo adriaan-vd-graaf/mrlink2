@@ -854,6 +854,182 @@ def match_n_variants_n_individuals_from_plink_log(plink_logfile: str) -> Tuple[i
     raise ValueError('Did not find n_individuals in the plink log.')
 
 
+
+def run_colocalization_analysis(bXs, bYs, pXs, pYs, n_exp, n_out, mafs, ld_mat: np.ndarray,
+                          out_file='tmp__colocalization__testing_out.txt.gz', in_file='tmp__colocalization__testing_in.txt.gz', ld_file='tmp__colocalization__testing_ld.bin'):
+    stderr = subprocess.DEVNULL if not verbosity else None
+    stdout = subprocess.DEVNULL if not verbosity else None
+
+    all_dfs = []
+    # ['MAF', 'pvalues', 'N', 'type', 'simulation'])
+    if len(bXs.shape) == 2:
+        n_sims = bXs.shape[1]
+        for i_pheno in range(n_sims):
+            exp_tmp_df = pd.DataFrame()
+            exp_tmp_df['beta'] = bXs[:, i_pheno] * mafs * (1 - mafs)
+            exp_tmp_df['MAF'] = mafs
+            exp_tmp_df['p_values'] = pXs[:, i_pheno]
+            exp_tmp_df['N'] = n_exp
+            exp_tmp_df['type'] = 'quant'
+            exp_tmp_df['simulation'] = i_pheno
+            exp_tmp_df['exp_or_outcome'] = 'exposure'
+
+            out_tmp_df = pd.DataFrame()
+            out_tmp_df['beta'] = bYs[:, i_pheno] * mafs * (1 - mafs)
+            out_tmp_df['MAF'] = mafs
+            out_tmp_df['p_values'] = pYs[:, i_pheno]
+            out_tmp_df['N'] = n_out
+            out_tmp_df['type'] = 'quant'
+            out_tmp_df['simulation'] = i_pheno
+            out_tmp_df['exp_or_outcome'] = 'outcome'
+
+            all_dfs.append(exp_tmp_df)
+            all_dfs.append(out_tmp_df)
+
+    else:
+        n_sims = 1
+        for i_pheno in range(n_sims):
+            exp_tmp_df = pd.DataFrame()
+            exp_tmp_df['beta'] = bXs * mafs * (1 - mafs)
+            exp_tmp_df['MAF'] = mafs
+            exp_tmp_df['p_values'] = pXs
+            exp_tmp_df['N'] = n_exp
+            exp_tmp_df['type'] = 'quant'
+            exp_tmp_df['simulation'] = i_pheno
+            exp_tmp_df['exp_or_outcome'] = 'exposure'
+
+            out_tmp_df = pd.DataFrame()
+            out_tmp_df['beta'] = bYs * mafs * (1 - mafs)
+            out_tmp_df['MAF'] = mafs
+            out_tmp_df['p_values'] = pYs
+            out_tmp_df['N'] = n_out
+            out_tmp_df['type'] = 'quant'
+            out_tmp_df['simulation'] = i_pheno
+            out_tmp_df['exp_or_outcome'] = 'outcome'
+
+            all_dfs.append(exp_tmp_df)
+            all_dfs.append(out_tmp_df)
+
+    full_df = pd.concat(all_dfs)
+    full_df.to_csv(out_file, sep='\t', index=False)
+    ld_mat.tofile(ld_file)
+
+    subprocess.run(['Rscript', f'{os.path.dirname(os.path.abspath(__file__))}/r_analyses/colocalization_analysis.R',
+                    out_file, in_file, ld_file],
+                   check=True,
+                   stdout=stdout,
+                   stderr=stderr,
+                   )
+
+    if os.path.exists(in_file):
+        results = pd.read_csv(in_file, sep='\t')
+    else:
+        raise ValueError('Could not perform coloc')
+
+    os.remove(out_file)
+    os.remove(in_file)
+    os.remove(ld_file)
+
+    return results
+
+
+def run_external_mr_analysis(bXs, bYs, seXs, seYs, pXs, pYs, n_exp, n_out, mafs, ld_mat: np.ndarray, instruments,
+                             out_file='tmp__colocalization_mr_testing_out.txt.gz', in_file='mr_testing_in.txt.gz',
+                             ld_file='mr_testing_ld.bin'):
+
+    """
+    This function is written to run the MR analyses
+
+    :param bXs:
+    :param bYs:
+    :param seXs:
+    :param seYs:
+    :param pXs:
+    :param pYs:
+    :param n_exp:
+    :param n_out:
+    :param mafs:
+    :param ld_mat:
+    :param instruments:
+    :param out_file:
+    :param in_file:
+    :param ld_file:
+    :return: a dataframe of results.
+    """
+    all_dfs = []
+
+    print(instruments.shape)
+    if len(bXs.shape) == 2:
+        for i_pheno in range(bXs.shape[1]):
+            exp_tmp_df = pd.DataFrame()
+            exp_tmp_df['beta'] = bXs[:, i_pheno]  # * mafs * (1 - mafs)
+            exp_tmp_df['ses'] = seXs[:, i_pheno]  # * mafs * (1 - mafs)
+            exp_tmp_df['MAF'] = mafs
+            exp_tmp_df['p_values'] = pXs[:, i_pheno]
+            exp_tmp_df['N'] = n_exp
+            exp_tmp_df['type'] = 'quant'
+            exp_tmp_df['simulation'] = i_pheno
+            exp_tmp_df['exp_or_outcome'] = 'exposure'
+            exp_tmp_df['selected_as_instrument'] = instruments[:, i_pheno]
+
+            out_tmp_df = pd.DataFrame()
+            out_tmp_df['beta'] = bYs[:, i_pheno]  # * mafs * (1 - mafs)
+            out_tmp_df['ses'] = seYs[:, i_pheno]
+            out_tmp_df['MAF'] = mafs
+            out_tmp_df['p_values'] = pYs[:, i_pheno]
+            out_tmp_df['N'] = n_out
+            out_tmp_df['type'] = 'quant'
+            out_tmp_df['simulation'] = i_pheno
+            out_tmp_df['exp_or_outcome'] = 'outcome'
+            out_tmp_df['selected_as_instrument'] = instruments[:, i_pheno]
+
+            all_dfs.append(exp_tmp_df)
+            all_dfs.append(out_tmp_df)
+
+    else:
+        for i_pheno in range(1):
+            exp_tmp_df = pd.DataFrame()
+            exp_tmp_df['beta'] = bXs
+            exp_tmp_df['ses'] = seXs
+            exp_tmp_df['MAF'] = mafs
+            exp_tmp_df['p_values'] = pXs
+            exp_tmp_df['N'] = n_exp
+            exp_tmp_df['type'] = 'quant'
+            exp_tmp_df['simulation'] = i_pheno
+            exp_tmp_df['exp_or_outcome'] = 'exposure'
+            exp_tmp_df['selected_as_instrument'] = instruments
+
+            out_tmp_df = pd.DataFrame()
+            out_tmp_df['beta'] = bYs
+            out_tmp_df['ses'] = seYs
+            out_tmp_df['MAF'] = mafs
+            out_tmp_df['p_values'] = pYs
+            out_tmp_df['N'] = n_out
+            out_tmp_df['type'] = 'quant'
+            out_tmp_df['simulation'] = i_pheno
+            out_tmp_df['exp_or_outcome'] = 'outcome'
+            out_tmp_df['selected_as_instrument'] = instruments
+
+            all_dfs.append(exp_tmp_df)
+            all_dfs.append(out_tmp_df)
+
+    full_df = pd.concat(all_dfs)
+    full_df.to_csv(out_file, sep='\t', index=False, float_format='%.30e')
+    ld_mat.tofile(ld_file)
+
+    subprocess.run(['Rscript', f'{os.path.dirname(os.path.abspath(__file__))}/r_analyses/mr_analyses.R',
+                    out_file, in_file, ld_file],
+                   check=True  # , stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+                   )
+
+    if os.path.exists(in_file):
+        results = pd.read_csv(in_file, sep='\t')
+    else:
+        raise ValueError('Could not perform external mr analyses')
+
+    return results
+
+
 def mr_link2_on_region(region: StartEndRegion,
                        exposure_df: pd.DataFrame,
                        outcome_df: pd.DataFrame,
@@ -977,9 +1153,11 @@ def mr_link2_on_region(region: StartEndRegion,
     ## these should have been normalized. In my case they are.
     exp_betas = np.asarray([snp_to_beta_dict[x][0] for x in ordered_snps], dtype=float)
     exp_pvals = np.asarray([exp_dict[x][3] for x in ordered_snps], dtype=float)
+    exp_ses = np.asarray([exp_dict[x][4] for x in ordered_snps], dtype=float)
 
     out_betas = np.asarray([snp_to_beta_dict[x][1] for x in ordered_snps], dtype=float)
     out_pvals = np.asarray([out_dict[x][3] for x in ordered_snps], dtype=float)
+    out_ses = np.asarray([out_dict[x][4] for x in ordered_snps], dtype=float)
 
 
     """
@@ -992,8 +1170,25 @@ def mr_link2_on_region(region: StartEndRegion,
         raise ValueError(
             f'Too many SNPs in {region} region, after filtering, contains: {m_snps} snps > {max_snp_threshold}'
             'will take too long. Consider reducing the region size or pruning the correlation matrix more.')
+
+    print('    Starting external analyses')
     n_exp = int(np.median(regional_exp_df.n))
     n_out = int(np.median(regional_out_df.n))
+
+    mafs = np.zeros_like(exp_betas)
+    mafs[:] = 0.5
+
+
+    coloc_results = run_colocalization_analysis(exp_betas, out_betas, exp_pvals, out_pvals, n_exp, n_out, mafs,
+                                          correlation_mat, out_file = tmp_prepend + '_coloc_out',
+                                          in_file = tmp_prepend + '_coloc_in', ld_file = tmp_prepend + 'coloc_ld.bin')
+    instruments = np.zeros(exp_betas.shape[0], dtype=bool)
+    tmp_instruments = np.asarray(select_instruments_by_clumping(exp_pvals, correlation_mat, 5e-8, r_threshold=0.1), dtype=int)
+    for instrument in tmp_instruments:
+        instruments[instrument] = True
+    r_mr_results = run_external_mr_analysis(exp_betas, out_betas, exp_ses, out_ses,  exp_pvals, out_pvals, n_exp, n_out, mafs,
+                                          correlation_mat,instruments= instruments, out_file = tmp_prepend + '_mr_out',
+                                          in_file = tmp_prepend + '_mr_in', ld_file = tmp_prepend + 'mr_ld.bin')
 
     print('     Starting MR-link2')
 
@@ -1062,6 +1257,9 @@ def mr_link2_on_region(region: StartEndRegion,
 
         this_run['var_explained'] = var_explained
 
+        this_run = this_run.join(r_mr_results, rsuffix='')
+        this_run = this_run.join(coloc_results, rsuffix='')
+
         results_list.append(this_run)
 
     mr_results_df = pd.concat(results_list)
@@ -1069,10 +1267,24 @@ def mr_link2_on_region(region: StartEndRegion,
     mr_results_df['region'] = str(region)
     mr_results_df['m_snps_overlap'] = m_snps
 
-    mr_results_df = mr_results_df[['region', 'var_explained', 'm_snps_overlap',
+
+    columns = ['region', 'var_explained', 'm_snps_overlap',
                                    'alpha', 'se(alpha)', 'p(alpha)',
                                    'sigma_y', 'se(sigma_y)', 'p(sigma_y)',
-                                   'sigma_x', 'function_time', ]]
+                                   'sigma_x', 'function_time',
+                                   'beta_ivw', 'se_ivw', 'p_ivw',
+                                   'beta_ivw_r', 'se_ivw_r', 'p_ivw_r',
+                                   'beta_pca', 'se_pca', 'p_pca',
+                                   'PP.H1.abf', 'PP.H2.abf', 'PP.H3.abf', 'PP.H4.abf']
+
+    if 'susie_max_PP.H4.abf' in mr_results_df.columns:
+        columns += ['susie_max_PP.H1.abf',
+                    'susie_max_PP.H2.abf',
+                    'susie_max_PP.H3.abf',
+                    'susie_max_PP.H4.abf']
+
+
+    mr_results_df = mr_results_df[columns]
 
     ## this is a normalization step that is done as the likelihood function computes them per SNP
     mr_results_df['sigma_x'] = mr_results_df['sigma_x'] * mr_results_df['m_snps_overlap']
@@ -1131,7 +1343,14 @@ def read_ld_matrix_local(geno_file_obj: PlinkGenoReader, list_of_snps, maf_thres
                             if not (bool_1 or bool_2)]
     ld_matrix = np.corrcoef(genotypes.T)
 
-    ld_matrix, ordered_snps = remove_highly_correlated(ld_matrix, genotype_matrix_snps, max_correlation)
+    # it can happen that there are no SNPs available after this filter , we return None.
+    if genotypes.shape[1] == 0:
+        return None, None
+
+    try:
+        ld_matrix, ordered_snps = remove_highly_correlated(ld_matrix, genotype_matrix_snps, max_correlation)
+    except:
+        return None, None
 
     return ld_matrix, ordered_snps
 
@@ -1374,6 +1593,13 @@ Pleiotropy robust cis Mendelian randomization
                              'to remove winners curse.'
                         )
 
+    parser.add_argument('--max_snps_in_correlation_matrix',
+                        required=False,
+                        default=5250,
+                        help='How many SNPs are allowed in the correlation matrix, as it can take a lot of time to '
+                             'Do the eigendecompositions and Rscripts otherwise.'
+                        )
+
     parser.add_argument('--verbose',
                         default=0,
                         help='Set to 1 if you want to read more output, for debugging purposes ')
@@ -1391,7 +1617,10 @@ Pleiotropy robust cis Mendelian randomization
     maf_threshold = float(args.maf_threshold)
     max_correlation = float(args.max_correlation)
 
+    max_correlation_matrix_snps = int(args.max_snps_in_correlation_matrix)
+
     read_chunk = int(args.regions_to_read_at_the_same_time)
+
 
     max_missingness = float(args.max_missingness)
     if 0.0 > max_missingness > 1.0:
@@ -1514,6 +1743,12 @@ Pleiotropy robust cis Mendelian randomization
             combined_df = pd.concat(all_results)
 
         exceptions = []
+        if os.path.exists(args.out + '_no_estimate'):
+            with open(args.out + '_no_estimate', 'a') as f:
+                for region, exception in exceptions:
+                    f.write(f'{region}\t{exception}\n')
+
+
         """
         HERE, we perform the reading of chunks 
         """
@@ -1566,8 +1801,21 @@ Pleiotropy robust cis Mendelian randomization
 
                 regional_exposure_df = regional_exposure_df[regional_exposure_df.n >= (max_missingness * regional_exposure_df.n.max())]
                 if verbosity:
-                    print(f'after missingness filter for {region}: {exposure_df.shape=}')
+                    print(f'after missingness filter for {region}: {regional_exposure_df.shape=}')
 
+                regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
+                                                                             regional_exposure_df.rsid,
+                                                                             maf_threshold=maf_threshold,
+                                                                             max_correlation=max_correlation,
+                                                                             )
+                if regional_ld_matrix is None:
+                    exceptions.append((region, 'NO_SNPS_IN_LD_MATRIX'))
+                    print(f'Unable to identify mr-link2 results in {region} region due to no SNPs in the LD matrix')
+                    continue
+
+                snps_and_alleles_in_ld_matrix = [(x, plink_geno_obj.bim_data[x][2], plink_geno_obj.bim_data[x][3]) for x
+                                                 in
+                                                 snps_in_ld_matrix]
 
                 for outcome_location in sumstats_outcome:
 
@@ -1605,16 +1853,6 @@ Pleiotropy robust cis Mendelian randomization
                         print(f'after missingness filter: {regional_outcome_df.shape=}')
 
 
-
-
-                    regional_ld_matrix, snps_in_ld_matrix = read_ld_matrix_local(plink_geno_obj,
-                                                                                 regional_exposure_df.rsid,
-                                                                                 maf_threshold=maf_threshold,
-                                                                                 max_correlation=max_correlation,
-                                                                                 )
-                    snps_and_alleles_in_ld_matrix = [(x, plink_geno_obj.bim_data[x][2], plink_geno_obj.bim_data[x][3]) for x in
-                                                     snps_in_ld_matrix]
-
                     try:
                         regional_results = mr_link2_on_region(region,
                                                               regional_exposure_df,
@@ -1626,7 +1864,8 @@ Pleiotropy robust cis Mendelian randomization
                                                               snps_alleles_in_ld_matrix=snps_and_alleles_in_ld_matrix,
                                                               tmp_prepend=tmp_dir,
                                                               verbosity=verbosity,
-                                                              var_explained_grid=var_explained_grid)
+                                                              var_explained_grid=var_explained_grid,
+                                                              max_snp_threshold=max_correlation_matrix_snps)
                     except Exception as x:
                         exceptions.append((region, x))
                         print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
@@ -1644,19 +1883,21 @@ Pleiotropy robust cis Mendelian randomization
                     combined_df = pd.concat(all_results)
                     combined_df.to_csv(args.out + '_tmp', sep='\t', index=False)
 
-            # write results
-            if len(all_results) != 0 and combined_df is not None:
-                combined_df.to_csv(args.out, sep='\t', index=False)
-                if os.path.exists(args.out + '_tmp'):
-                    os.remove(args.out + '_tmp')
+                # write exceptions to a file
+                if len(exceptions) != 0:
+                    with open(args.out + '_no_estimate', 'a') as f:
+                        for region, exception in exceptions:
+                            f.write(f'{region}\t{exception}\n')
 
-            # write exceptions to a file
-            if len(exceptions) != 0:
-                with open(args.out + '_no_estimate', 'a') as f:
-                    for region, exception in exceptions:
-                        f.write(f'{region}\t{exception}\n')
+        # finally, clean up
+        for filename in files_to_remove:
+            if os.path.exists(filename):
+                os.remove(filename)
 
-            # finally, clean up
-            for filename in files_to_remove:
-                if os.path.exists(filename):
-                    os.remove(filename)
+        # Finally, write results to txt.
+        if len(all_results) != 0 and combined_df is not None:
+            combined_df.to_csv(args.out, sep='\t', index=False)
+            if os.path.exists(args.out + '_tmp'):
+                os.remove(args.out + '_tmp')
+
+
