@@ -29,6 +29,9 @@ r['source'](os.path.abspath(os.path.join(os.path.dirname(__file__), '..',  'R', 
 Now, we perform unit tests on the MR-link-2 functions. to ensure that there is no creep of the 
 First function v0
 """
+
+np.random.seed(42)
+
 def test_mr_link2_loglik_reference_v0_basic_r_concordance():
     th = np.array([0.1, 0.01, 0.01])
     lam = np.array([1, 2, 3])
