@@ -1,0 +1,309 @@
+	Unnamed: 0	matched_Node1_textlabel	matched_Node2_textlabel	hmdb_id_node_1	hmdb_id_node_2	substrate_name	product_name
+0	109	Glucose	Glucose	HMDB0000122	HMDB0000122	glucose	glucose
+1	124	Methionine	Methionine	HMDB0000696	HMDB0000696	methionine	methionine
+2	130	Cholesterol	Cholesterol	HMDB0000067	HMDB0000067	cholesterol	cholesterol
+3	157	Riboflavin	Riboflavin	HMDB0000244	HMDB0000244	riboflavin (vitamin b2)	riboflavin (vitamin b2)
+4	159	Creatinine	Creatinine	HMDB0000562	HMDB0000562	creatinine	creatinine
+5	160	a-Tocopherol	a-Tocopherol	HMDB0001893	HMDB0001893	alpha-tocopherol	alpha-tocopherol
+6	177	Cystathionine	Cysteine	HMDB0000099	HMDB0000574	cystathionine	cysteine
+7	216	Serine	Serine	HMDB0000187	HMDB0000187	serine	serine
+8	177	sphingosine-1-phosphate	Sphingosine	HMDB0000277	HMDB0000252	sphingosine 1-phosphate	sphingosine
+9	6	Methionine	Tyrosine	HMDB0000696	HMDB0000158	methionine	tyrosine
+10	7	valine	Tyrosine	HMDB0000883	HMDB0000158	valine	tyrosine
+11	8	GCA	GCDCA	HMDB0000138	HMDB0000637	glycohyocholate	glycochenodeoxycholate
+12	9	TCDCA	GCDCA	HMDB0000951	HMDB0000637	taurochenodeoxycholate	glycochenodeoxycholate
+13	10	Ornithine	Arginine	HMDB0000214	HMDB0000517	ornithine	arginine
+14	11	Ornithine	Citrulline	HMDB0000214	HMDB0000904	ornithine	citrulline
+15	12	Arginine	Ornithine	HMDB0000517	HMDB0000214	arginine	ornithine
+16	13	Citrulline	Ornithine	HMDB0000904	HMDB0000214	citrulline	ornithine
+17	16	Histidine	valine	HMDB0000177	HMDB0000883	histidine	valine
+18	17	Tyrosine	valine	HMDB0000158	HMDB0000883	tyrosine	valine
+19	18	GCDCA	GCA	HMDB0000637	HMDB0000138	glycochenodeoxycholate	glycohyocholate
+20	19	GCDCA	TCDCA	HMDB0000637	HMDB0000951	glycochenodeoxycholate	taurochenodeoxycholate
+21	22	Tyrosine	Methionine	HMDB0000158	HMDB0000696	tyrosine	methionine
+22	25	valine	Histidine	HMDB0000883	HMDB0000177	valine	histidine
+23	18	L-Glutamic acid	L-Glutamic acid	HMDB0000148	HMDB0000148	glutamate	glutamate
+24	24	L-Glutamic acid	L-Glutamic acid	HMDB0000148	HMDB0000148	glutamate	glutamate
+25	24	Thyroxine (T4)	Thyroxine (T4)	HMDB0000248	HMDB0000248	thyroxine	thyroxine
+26	4	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+27	5	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+28	6	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+29	7	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+30	8	Glycine	L-Glutamine	HMDB0000123	HMDB0000641	glycine	glutamine
+31	9	Taurine	L-Glutamine	HMDB0000251	HMDB0000641	taurine	glutamine
+32	10	Taurine	L-Glutamine	HMDB0000251	HMDB0000641	taurine	glutamine
+33	11	Glycine	Taurine	HMDB0000123	HMDB0000251	glycine	taurine
+34	12	Glycine	Taurine	HMDB0000123	HMDB0000251	glycine	taurine
+35	13	L-Glutamine	Taurine	HMDB0000641	HMDB0000251	glutamine	taurine
+36	14	L-Glutamine	Taurine	HMDB0000641	HMDB0000251	glutamine	taurine
+37	15	L-Glutamine	Glycine	HMDB0000641	HMDB0000123	glutamine	glycine
+38	16	Taurine	Glycine	HMDB0000251	HMDB0000123	taurine	glycine
+39	17	Taurine	Glycine	HMDB0000251	HMDB0000123	taurine	glycine
+40	0	caffeine	theobromine	HMDB0001847	HMDB0002825	caffeine	theobromine
+41	1	caffeine	paraxanthine	HMDB0001847	HMDB0001860	caffeine	paraxanthine
+42	3	theobromine	3,7-dimethyluric acid	HMDB0002825	HMDB0001982	theobromine	3,7-dimethylurate
+43	5	theobromine	caffeine	HMDB0002825	HMDB0001847	theobromine	caffeine
+44	7	1-methylxanthine	Xanthine	HMDB0010738	HMDB0000292	1-methylxanthine	xanthine
+45	8	7-methylxanthine	Xanthine	HMDB0001991	HMDB0000292	7-methylxanthine	xanthine
+46	9	1-methylxanthine	1-methyluric acid	HMDB0010738	HMDB0003099	1-methylxanthine	1-methylurate
+47	13	paraxanthine	1-methylxanthine	HMDB0001860	HMDB0010738	paraxanthine	1-methylxanthine
+48	15	paraxanthine	1,7-dimethyluric acid	HMDB0001860	HMDB0011103	paraxanthine	1,7-dimethylurate
+49	17	paraxanthine	7-methylxanthine	HMDB0001860	HMDB0001991	paraxanthine	7-methylxanthine
+50	98	Arachidonic acid	Arachidonic acid	HMDB0001043	HMDB0001043	arachidonate (20:4n6)	arachidonate (20:4n6)
+51	128	Cholesterol	Cholesterol	HMDB0000067	HMDB0000067	cholesterol	cholesterol
+52	134	Glucose	Glucose	HMDB0000122	HMDB0000122	glucose	glucose
+53	169	Ascorbic acid	a-Tocopherol	HMDB0000044	HMDB0001893	ascorbate (vitamin c)	alpha-tocopherol
+54	181	Methionine	Methionine sulfoxide	HMDB0000696	HMDB0002005	methionine	methionine sulfoxide
+55	222	a-Tocopherol	a-Tocopherol	HMDB0001893	HMDB0001893	alpha-tocopherol	alpha-tocopherol
+56	241	Serine	Cystathionine	HMDB0000187	HMDB0000099	serine	cystathionine
+57	243	Methionine	Methionine	HMDB0000696	HMDB0000696	methionine	methionine
+58	245	Methionine sulfoxide	Methionine	HMDB0002005	HMDB0000696	methionine sulfoxide	methionine
+59	259	EPA	EPA	HMDB0001999	HMDB0001999	eicosapentaenoate (epa; 20:5n3)	eicosapentaenoate (epa; 20:5n3)
+60	269	Cysteine	Cysteine	HMDB0000574	HMDB0000574	cysteine	cysteine
+61	273	Xanthine	Uric acid	HMDB0000292	HMDB0000289	xanthine	urate
+62	274	FAD	Uric acid	HMDB0001248	HMDB0000289	flavin adenine dinucleotide (fad)	urate
+63	275	Xanthine	Xanthine	HMDB0000292	HMDB0000292	xanthine	xanthine
+64	290	Hypoxanthine	Hypoxanthine	HMDB0000157	HMDB0000157	hypoxanthine	hypoxanthine
+65	291	Hypoxanthine	Hypoxanthine	HMDB0000157	HMDB0000157	hypoxanthine	hypoxanthine
+66	325	Uric acid	Uric acid	HMDB0000289	HMDB0000289	urate	urate
+67	327	Methionine	Methionine	HMDB0000696	HMDB0000696	methionine	methionine
+68	340	DPA	DPA	HMDB0001976	HMDB0001976	docosapentaenoate (n6 dpa; 22:5n6)	docosapentaenoate (n6 dpa; 22:5n6)
+69	350	DHA	DHA	HMDB0002183	HMDB0002183	docosahexaenoate (dha; 22:6n3)	docosahexaenoate (dha; 22:6n3)
+70	358	Riboflavin	Riboflavin	HMDB0000244	HMDB0000244	riboflavin (vitamin b2)	riboflavin (vitamin b2)
+71	359	Cystathionine	Cysteine	HMDB0000099	HMDB0000574	cystathionine	cysteine
+72	362	Serine	Serine	HMDB0000187	HMDB0000187	serine	serine
+73	428	ADP	ADP	HMDB0001341	HMDB0001341	adenosine 5'-diphosphate (adp)	adenosine 5'-diphosphate (adp)
+74	13	Cysteine	Cystathionine	HMDB0000574	HMDB0000099	cysteine	cystathionine
+75	15	Cystathionine	Cysteine	HMDB0000099	HMDB0000574	cystathionine	cysteine
+76	38	Serine	Cystathionine	HMDB0000187	HMDB0000099	serine	cystathionine
+77	98	Glucose	Glucose	HMDB0000122	HMDB0000122	glucose	glucose
+78	126	Cholesterol	Cholesterol	HMDB0000067	HMDB0000067	cholesterol	cholesterol
+79	127	Serine	Glycine	HMDB0000187	HMDB0000123	serine	glycine
+80	129	Serine	Serine	HMDB0000187	HMDB0000187	serine	serine
+81	143	Methionine	Methionine	HMDB0000696	HMDB0000696	methionine	methionine
+82	150	Cystathionine	Cysteine	HMDB0000099	HMDB0000574	cystathionine	cysteine
+83	190	Glycine	Glycine	HMDB0000123	HMDB0000123	glycine	glycine
+84	192	Cysteine	Cysteine	HMDB0000574	HMDB0000574	cysteine	cysteine
+85	15	Cotinine	Cotinine	HMDB0001046	HMDB0001046	cotinine	cotinine
+86	8	4OH-phenylpyruvate	4OH-phenyllactate	HMDB0000707	HMDB0000755	4-hydroxyphenylpyruvate	3-(4-hydroxyphenyl)lactate
+87	43	Cytidine	Uridine	HMDB0000089	HMDB0000296	cytidine	uridine
+88	3	L-Methionine	L-Methionine	HMDB0000696	HMDB0000696	methionine	methionine
+89	4	Methionine sulfoxide	L-Methionine	HMDB0002005	HMDB0000696	methionine sulfoxide	methionine
+90	11	L-Glutamic acid	L-Methionine	HMDB0000148	HMDB0000696	glutamate	methionine
+91	25	L-Methionine	Methionine sulfoxide	HMDB0000696	HMDB0002005	methionine	methionine sulfoxide
+92	54	Choline	Betaine	HMDB0000097	HMDB0000043	choline	betaine
+93	57	ADP	Pi	HMDB0001341	HMDB0001429	adenosine 5'-diphosphate (adp)	phosphate
+94	58	ADP	Pi	HMDB0001341	HMDB0001429	adenosine 5'-diphosphate (adp)	phosphate
+95	59	Pi	ADP	HMDB0001429	HMDB0001341	phosphate	adenosine 5'-diphosphate (adp)
+96	60	Pi	ADP	HMDB0001429	HMDB0001341	phosphate	adenosine 5'-diphosphate (adp)
+97	12	Aspartate	Aspartate	HMDB0000191	HMDB0000191	aspartate	aspartate
+98	15	Glucose	Glucose	HMDB0000122	HMDB0000122	glucose	glucose
+99	20	Pyruvate	Pyruvate	HMDB0000243	HMDB0000243	pyruvate	pyruvate
+100	21	Pyruvate	Lactate	HMDB0000243	HMDB0000190	pyruvate	lactate
+101	36	Aspartate	Aspartate	HMDB0000191	HMDB0000191	aspartate	aspartate
+102	48	Glucose	Glucose	HMDB0000122	HMDB0000122	glucose	glucose
+103	61	Lactate	Pyruvate	HMDB0000190	HMDB0000243	lactate	pyruvate
+104	8	L-Tryptophan	Serotonin	HMDB0000929	HMDB0000259	tryptophan	serotonin (5ht)
+105	363	Ascorbic acid	Beta-Glycerophosphoric acid	HMDB0000044	HMDB0002520	ascorbate (vitamin c)	glycerol 2-phosphate
+106	389	Beta-Glycerophosphoric acid	Ascorbic acid	HMDB0002520	HMDB0000044	glycerol 2-phosphate	ascorbate (vitamin c)
+107	3	L-Glutamic acid	Oxoglutaric acid	HMDB0000148	HMDB0000208	glutamate	alpha-ketoglutarate
+108	21	L-Glutamic acid	L-Glutamine	HMDB0000148	HMDB0000641	glutamate	glutamine
+109	28	1-Pyrroline-5-carboxylic acid	L-Glutamic acid	HMDB0001301	HMDB0000148	s-1-pyrroline-5-carboxylate	glutamate
+110	42	L-Arginine	Ornithine	HMDB0000517	HMDB0000214	arginine	ornithine
+111	44	Ornithine	Citrulline	HMDB0000214	HMDB0000904	ornithine	citrulline
+112	56	L-Lactic acid	Pyruvic acid	HMDB0000190	HMDB0000243	lactate	pyruvate
+113	58	L-Alanine	Pyruvic acid	HMDB0000161	HMDB0000243	alanine	pyruvate
+114	69	D-Glucose	D-Glucose	HMDB0000122	HMDB0000122	glucose	glucose
+115	70	D-Maltose	D-Glucose	HMDB0000163	HMDB0000122	maltose	glucose
+116	81	D-Fructose	D-Fructose	HMDB0000660	HMDB0000660	fructose	fructose
+117	120	Inosinic acid	Inosine	HMDB0000175	HMDB0000195	inosine 5'-monophosphate (imp)	inosine
+118	123	Inosine	Hypoxanthine	HMDB0000195	HMDB0000157	inosine	hypoxanthine
+119	125	Hypoxanthine	Xanthine	HMDB0000157	HMDB0000292	hypoxanthine	xanthine
+120	127	Hypoxanthine	Adenosine	HMDB0000157	HMDB0000050	hypoxanthine	adenosine
+121	128	Adenosine monophosphate	Adenosine	HMDB0000045	HMDB0000050	adenosine 5'-monophosphate (amp)	adenosine
+122	138	Xanthine	Uric acid	HMDB0000292	HMDB0000289	xanthine	urate
+123	142	Uric acid	Allantoin	HMDB0000289	HMDB0000462	urate	allantoin
+124	156	L-Histidine	Urocanic acid	HMDB0000177	HMDB0000301	histidine	trans-urocanate
+125	161	Formiminoglutamic acid	L-Glutamic acid	HMDB0000854	HMDB0000148	formiminoglutamate	glutamate
+126	163	4-Hydroxyphenylpyruvic acid	L-Tyrosine	HMDB0000707	HMDB0000158	4-hydroxyphenylpyruvate	tyrosine
+127	164	L-Phenylalanine	L-Tyrosine	HMDB0000159	HMDB0000158	phenylalanine	tyrosine
+128	166	Phenylpyruvic acid	L-Phenylalanine	HMDB0000205	HMDB0000159	phenylpyruvate	phenylalanine
+129	197	L-Kynurenine	Kynurenic acid	HMDB0000684	HMDB0000715	kynurenine	kynurenate
+130	198	L-Kynurenine	2-Aminobenzoic acid	HMDB0000684	HMDB0001123	kynurenine	anthranilate
+131	236	L-Aspartic acid	L-Asparagine	HMDB0000191	HMDB0000168	aspartate	asparagine
+132	239	L-Threonine	Glycine	HMDB0000167	HMDB0000123	threonine	glycine
+133	241	L-Threonine	2-Ketobutyric acid	HMDB0000167	HMDB0000005	threonine	alpha-ketobutyrate
+134	243	2-Ketobutyric acid	2-Hydroxybutyric acid	HMDB0000005	HMDB0000008	alpha-ketobutyrate	2-hydroxybutyrate (ahb)
+135	251	Methionine sulfoxide	L-Methionine	HMDB0002005	HMDB0000696	methionine sulfoxide	methionine
+136	253	L-Cysteine	Pyruvic acid	HMDB0000574	HMDB0000243	cysteine	pyruvate
+137	255	L-Serine	Pyruvic acid	HMDB0000187	HMDB0000243	serine	pyruvate
+138	256	L-Cysteine	L-Cystine	HMDB0000574	HMDB0000192	cysteine	cystine
+139	266	Hypotaurine	Taurine	HMDB0000965	HMDB0000251	hypotaurine	taurine
+140	286	Oxoglutaric acid	4-Hydroxy-2-oxoglutaric acid	HMDB0000208	HMDB0002070	alpha-ketoglutarate	4-hydroxy-2-oxoglutaric acid
+141	287	L-Glutamic acid	L-Alanine	HMDB0000148	HMDB0000161	glutamate	alanine
+142	288	Pyruvic acid	L-Alanine	HMDB0000243	HMDB0000161	pyruvate	alanine
+143	291	Guanidoacetic acid	Guanidoacetic acid	HMDB0000128	HMDB0000128	guanidinoacetate	guanidinoacetate
+144	292	Creatine	Guanidoacetic acid	HMDB0000064	HMDB0000128	creatine	guanidinoacetate
+145	295	Creatine	Creatine	HMDB0000064	HMDB0000064	creatine	creatine
+146	310	Cytidine	Uridine	HMDB0000089	HMDB0000296	cytidine	uridine
+147	311	Uridine	Uridine	HMDB0000296	HMDB0000296	uridine	uridine
+148	320	Cytidine	Cytosine	HMDB0000089	HMDB0000630	cytidine	cytosine
+149	321	Cytosine	Cytosine	HMDB0000630	HMDB0000630	cytosine	cytosine
+150	322	Cytidine	Cytidine	HMDB0000089	HMDB0000089	cytidine	cytidine
+151	330	Ureidopropionic acid	Beta-Alanine	HMDB0000026	HMDB0000056	3-ureidopropionate	beta-alanine
+152	331	Beta-Alanine	Beta-Alanine	HMDB0000056	HMDB0000056	beta-alanine	beta-alanine
+153	332	Ureidopropionic acid	Ureidopropionic acid	HMDB0000026	HMDB0000026	3-ureidopropionate	3-ureidopropionate
+154	347	Dihydrothymine	Dihydrothymine	HMDB0000079	HMDB0000079	5,6-dihydrothymine	5,6-dihydrothymine
+155	447	Cortisol	Cortisol	HMDB0000063	HMDB0000063	cortisol	cortisol
+156	448	Cortisol	Cortisone	HMDB0000063	HMDB0002802	cortisol	cortisone
+157	449	Cortisone	Cortisone	HMDB0002802	HMDB0002802	cortisone	cortisone
+158	476	Cholesterol	Cholesterol	HMDB0000067	HMDB0000067	cholesterol	cholesterol
+159	497	Cholic acid	Cholic acid	HMDB0000619	HMDB0000619	cholate	cholate
+160	499	Taurocholic acid	Taurocholic acid	HMDB0000036	HMDB0000036	taurocholate	taurocholate
+161	501	Glycocholic acid	Glycocholic acid	HMDB0000138	HMDB0000138	glycohyocholate	glycohyocholate
+162	516	Lathosterol	Lathosterol	HMDB0001170	HMDB0001170	lathosterol	lathosterol
+163	555	Pantothenic acid	Pantothenic acid	HMDB0000210	HMDB0000210	pantothenate	pantothenate
+164	558	L-Cysteine	L-Cysteine	HMDB0000574	HMDB0000574	cysteine	cysteine
+165	580	L-Valine	Alpha-ketoisovaleric acid	HMDB0000883	HMDB0000019	valine	3-methyl-2-oxobutyrate
+166	581	Alpha-ketoisovaleric acid	Alpha-ketoisovaleric acid	HMDB0000019	HMDB0000019	3-methyl-2-oxobutyrate	3-methyl-2-oxobutyrate
+167	582	L-Valine	L-Valine	HMDB0000883	HMDB0000883	valine	valine
+168	597	(S)-b-aminoisobutyric acid	(S)-b-aminoisobutyric acid	HMDB0002166	HMDB0002166	3-aminoisobutyrate	3-aminoisobutyrate
+169	598	L-Isoleucine	3-Methyl-2-oxovaleric acid	HMDB0000172	HMDB0000491	isoleucine	3-methyl-2-oxovalerate
+170	599	3-Methyl-2-oxovaleric acid	3-Methyl-2-oxovaleric acid	HMDB0000491	HMDB0000491	3-methyl-2-oxovalerate	3-methyl-2-oxovalerate
+171	600	L-Isoleucine	L-Isoleucine	HMDB0000172	HMDB0000172	isoleucine	isoleucine
+172	613	L-Leucine	Ketoleucine	HMDB0000687	HMDB0000695	leucine	4-methyl-2-oxopentanoate
+173	614	Ketoleucine	Ketoleucine	HMDB0000695	HMDB0000695	4-methyl-2-oxopentanoate	4-methyl-2-oxopentanoate
+174	615	L-Leucine	L-Leucine	HMDB0000687	HMDB0000687	leucine	leucine
+175	625	Glycerol 3-phosphate	Glycerol 3-phosphate	HMDB0000126	HMDB0000126	glycerol 3-phosphate	glycerol 3-phosphate
+176	626	Glycerol 3-phosphate	Glycerol	HMDB0000126	HMDB0000131	glycerol 3-phosphate	glycerol
+177	627	Glycerol	Glycerol	HMDB0000131	HMDB0000131	glycerol	glycerol
+178	628	Glycerol 3-phosphate	Glycerylphosphorylethanolamine	HMDB0000126	HMDB0000114	glycerol 3-phosphate	glycerophosphoethanolamine
+179	629	Glycerylphosphorylethanolamine	Glycerylphosphorylethanolamine	HMDB0000114	HMDB0000114	glycerophosphoethanolamine	glycerophosphoethanolamine
+180	633	D-Mannose	D-Mannose	HMDB0000169	HMDB0000169	mannose	mannose
+181	640	Gluconic acid	Gluconic acid	HMDB0000625	HMDB0000625	gluconate	gluconate
+182	645	L-Arabinose	L-Arabinose	HMDB0000646	HMDB0000646	arabinose	arabinose
+183	654	D-Xylose	D-Xylose	HMDB0000098	HMDB0000098	xylose	xylose
+184	669	Myoinositol	D-Glucuronic acid	HMDB0000211	HMDB0000127	myo-inositol	glucuronate
+185	670	D-Glucuronic acid	Gulonic acid	HMDB0000127	HMDB0003290	glucuronate	gulonate*
+186	680	Ascorbic acid	Ascorbic acid	HMDB0000044	HMDB0000044	ascorbate (vitamin c)	ascorbate (vitamin c)
+187	692	Sucrose	D-Glucose	HMDB0000258	HMDB0000122	sucrose	glucose
+188	695	D-Glucose	D-Glucose	HMDB0000122	HMDB0000122	glucose	glucose
+189	696	Sucrose	D-Fructose	HMDB0000258	HMDB0000660	sucrose	fructose
+190	697	D-Fructose	D-Fructose	HMDB0000660	HMDB0000660	fructose	fructose
+191	698	Sucrose	Sucrose	HMDB0000258	HMDB0000258	sucrose	sucrose
+192	700	Myoinositol	Myoinositol	HMDB0000211	HMDB0000211	myo-inositol	myo-inositol
+193	701	Myo-inositol 1-phosphate	Myoinositol	HMDB0000213	HMDB0000211	inositol 1-phosphate (i1p)	myo-inositol
+194	703	Myo-inositol 1-phosphate	Myo-inositol 1-phosphate	HMDB0000213	HMDB0000213	inositol 1-phosphate (i1p)	inositol 1-phosphate (i1p)
+195	707	D-Galactose	D-Galactose	HMDB0000143	HMDB0000143	hexose	hexose
+196	713	D-Maltose	D-Maltose	HMDB0000163	HMDB0000163	maltose	maltose
+197	718	Choline	Phosphorylcholine	HMDB0000097	HMDB0001565	choline	choline phosphate
+198	719	Phosphorylcholine	Phosphorylcholine	HMDB0001565	HMDB0001565	choline phosphate	choline phosphate
+199	720	Choline	Choline	HMDB0000097	HMDB0000097	choline	choline
+200	722	Betaine	Betaine	HMDB0000043	HMDB0000043	betaine	betaine
+201	723	Betaine	Dimethylglycine	HMDB0000043	HMDB0000092	betaine	dimethylglycine
+202	724	Dimethylglycine	Dimethylglycine	HMDB0000092	HMDB0000092	dimethylglycine	dimethylglycine
+203	725	Dimethylglycine	Sarcosine	HMDB0000092	HMDB0000271	dimethylglycine	sarcosine
+204	726	Sarcosine	Sarcosine	HMDB0000271	HMDB0000271	sarcosine	sarcosine
+205	727	Sarcosine	Glycine	HMDB0000271	HMDB0000123	sarcosine	glycine
+206	728	Glycine	Glycine	HMDB0000123	HMDB0000123	glycine	glycine
+207	729	Glycine	L-Serine	HMDB0000123	HMDB0000187	glycine	serine
+208	731	L-Serine	L-Serine	HMDB0000187	HMDB0000187	serine	serine
+209	737	L-Serine	L-Serine	HMDB0000187	HMDB0000187	serine	serine
+210	740	Sphinganine	Sphinganine	HMDB0000269	HMDB0000269	sphinganine	sphinganine
+211	741	Sphinganine	Sphingosine	HMDB0000269	HMDB0000252	sphinganine	sphingosine
+212	742	Sphingosine	Sphingosine	HMDB0000252	HMDB0000252	sphingosine	sphingosine
+213	766	O-Phosphoethanolamine	O-Phosphoethanolamine	HMDB0000224	HMDB0000224	phosphoethanolamine	phosphoethanolamine
+214	770	Formiminoglutamic acid	L-Glutamic acid	HMDB0000854	HMDB0000148	formiminoglutamate	glutamate
+215	771	L-Glutamic acid	L-Glutamic acid	HMDB0000148	HMDB0000148	glutamate	glutamate
+216	772	Formiminoglutamic acid	Formiminoglutamic acid	HMDB0000854	HMDB0000854	formiminoglutamate	formiminoglutamate
+217	0	Oleic acid	OA	HMDB0000207	HMDB0000207	oleate (18:1n9)	oleate (18:1n9)
+218	26	Nicotinamide	Nicotinamide	HMDB0001406	HMDB0001406	nicotinamide	nicotinamide
+219	30	L-Tryptophan	L-Tryptophan	HMDB0000929	HMDB0000929	tryptophan	tryptophan
+220	46	Nicotinamide	Nicotinamide	HMDB0001406	HMDB0001406	nicotinamide	nicotinamide
+221	1	Glucose	Pyruvate	HMDB0000122	HMDB0000243	glucose	pyruvate
+222	7	Pyruvate	Lactate	HMDB0000243	HMDB0000190	pyruvate	lactate
+223	0	AA	AA	HMDB0001043	HMDB0001043	arachidonate (20:4n6)	arachidonate (20:4n6)
+224	4	glycine	hippuric acid	HMDB0000123	HMDB0000714	glycine	hippurate
+225	10	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+226	11	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+227	12	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+228	13	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+229	9	Pyruvate	Lactate	HMDB0000243	HMDB0000190	pyruvate	lactate
+230	38	Lactate	Lactate	HMDB0000190	HMDB0000190	lactate	lactate
+231	12	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+232	13	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+233	42	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+234	43	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+235	478	Pi	ADP	HMDB0001429	HMDB0001341	phosphate	adenosine 5'-diphosphate (adp)
+236	480	ADP	Pi	HMDB0001341	HMDB0001429	adenosine 5'-diphosphate (adp)	phosphate
+237	828	Pi	ADP	HMDB0001429	HMDB0001341	phosphate	adenosine 5'-diphosphate (adp)
+238	829	ADP	Pi	HMDB0001341	HMDB0001429	adenosine 5'-diphosphate (adp)	phosphate
+239	1	PYR	PYR	HMDB0000243	HMDB0000243	pyruvate	pyruvate
+240	2	ADP	PYR	HMDB0001341	HMDB0000243	adenosine 5'-diphosphate (adp)	pyruvate
+241	3	PYR	LAC	HMDB0000243	HMDB0000190	pyruvate	lactate
+242	6	LACe	LAC	HMDB0000190	HMDB0000190	lactate	lactate
+243	49	LAC	LACe	HMDB0000190	HMDB0000190	lactate	lactate
+244	118	LAC	PYR	HMDB0000190	HMDB0000243	lactate	pyruvate
+245	121	GLUe	GLU	HMDB0000122	HMDB0000122	glucose	glucose
+246	125	GLU	GLUe	HMDB0000122	HMDB0000122	glucose	glucose
+247	18	"Retinol
+Vitamin A"	"Retinol
+Vitamin A"	HMDB0000305	HMDB0000305	retinol (vitamin a)	retinol (vitamin a)
+248	25	UCA	Histidine	HMDB0000301	HMDB0000177	trans-urocanate	histidine
+249	11	Phenylalanine	Tyrosine	HMDB0000159	HMDB0000158	phenylalanine	tyrosine
+250	16	Oxobutyrate	Cystathionine	HMDB0000005	HMDB0000099	alpha-ketobutyrate	cystathionine
+251	17	Serine	Cystathionine	HMDB0000187	HMDB0000099	serine	cystathionine
+252	41	Threonine	Oxobutyrate	HMDB0000167	HMDB0000005	threonine	alpha-ketobutyrate
+253	42	Cystathionine	Oxobutyrate	HMDB0000099	HMDB0000005	cystathionine	alpha-ketobutyrate
+254	58	Serine	Pyruvate	HMDB0000187	HMDB0000243	serine	pyruvate
+255	59	Lactate	Pyruvate	HMDB0000190	HMDB0000243	lactate	pyruvate
+256	60	Alanine	Pyruvate	HMDB0000161	HMDB0000243	alanine	pyruvate
+257	61	Cysteine	Pyruvate	HMDB0000574	HMDB0000243	cysteine	pyruvate
+258	86	Pyruvate	Lactate	HMDB0000243	HMDB0000190	pyruvate	lactate
+259	88	Pyruvate	Cysteine	HMDB0000243	HMDB0000574	pyruvate	cysteine
+260	90	Serine	Cysteine	HMDB0000187	HMDB0000574	serine	cysteine
+261	91	Pyruvate	Alanine	HMDB0000243	HMDB0000161	pyruvate	alanine
+262	100	Tyrosine	Thyroxine	HMDB0000158	HMDB0000248	tyrosine	thyroxine
+263	116	Serine	Glycine	HMDB0000187	HMDB0000123	serine	glycine
+264	139	Glycine	Serine	HMDB0000123	HMDB0000187	glycine	serine
+265	169	Glutamate	Glutamine	HMDB0000148	HMDB0000641	glutamate	glutamine
+266	177	Glutamate	Histidine	HMDB0000148	HMDB0000177	glutamate	histidine
+267	192	Glutamine	Glutamate	HMDB0000641	HMDB0000148	glutamine	glutamate
+268	193	Glutamine	Glutamate	HMDB0000641	HMDB0000148	glutamine	glutamate
+269	196	Histidine	Glutamate	HMDB0000177	HMDB0000148	histidine	glutamate
+270	234	Aspartate	Asparagine	HMDB0000191	HMDB0000168	aspartate	asparagine
+271	236	Aspartate	Citrulline	HMDB0000191	HMDB0000904	aspartate	citrulline
+272	240	Asparagine	Aspartate	HMDB0000168	HMDB0000191	asparagine	aspartate
+273	262	Arginine	Ornithine	HMDB0000517	HMDB0000214	arginine	ornithine
+274	264	Citrulline	Ornithine	HMDB0000904	HMDB0000214	citrulline	ornithine
+275	408	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+276	409	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+277	410	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+278	411	Phosphate	Phosphate	HMDB0001429	HMDB0001429	phosphate	phosphate
+279	2	Sphinganine	Sa 1-phosphate	HMDB0000269	HMDB0001383	sphinganine	sphinganine-1-phosphate
+280	10	Sphingosine	Ceramides	HMDB0000252	HMDB0004949	sphingosine	n-palmitoyl-sphingosine (d18:1/16:0)
+281	13	Sphingomyelin	Ceramides	HMDB0001348	HMDB0004949	stearoyl sphingomyelin (d18:1/18:0)	n-palmitoyl-sphingosine (d18:1/16:0)
+282	15	Sa 1-phosphate	Sphinganine	HMDB0001383	HMDB0000269	sphinganine-1-phosphate	sphinganine
+283	34	Sphingosine	Sphingosine 1-phosphate	HMDB0000252	HMDB0000277	sphingosine	sphingosine 1-phosphate
+284	35	Sphingosine 1-phosphate	Sphingosine	HMDB0000277	HMDB0000252	sphingosine 1-phosphate	sphingosine
+285	36	Ceramides	Sphingosine	HMDB0004949	HMDB0000252	n-palmitoyl-sphingosine (d18:1/16:0)	sphingosine
+286	41	Ceramides	Sphingomyelin	HMDB0004949	HMDB0001348	n-palmitoyl-sphingosine (d18:1/16:0)	stearoyl sphingomyelin (d18:1/18:0)
+287	44	Glycocholic acid	Taurocholic acid	HMDB0000138	HMDB0000036	glycohyocholate	taurocholate
+288	45	Glycocholic acid	Taurocholic acid	HMDB0000138	HMDB0000036	glycohyocholate	taurocholate
+289	46	Bilirubin	Taurocholic acid	HMDB0000054	HMDB0000036	bilirubin (z,z)	taurocholate
+290	47	Bilirubin	Taurocholic acid	HMDB0000054	HMDB0000036	bilirubin (z,z)	taurocholate
+291	48	Isoursodeoxycholic acid	Taurocholic acid	HMDB0000686	HMDB0000036	isoursodeoxycholate	taurocholate
+292	49	Glycocholic acid	Bilirubin	HMDB0000138	HMDB0000054	glycohyocholate	bilirubin (z,z)
+293	50	Taurocholic acid	Bilirubin	HMDB0000036	HMDB0000054	taurocholate	bilirubin (z,z)
+294	51	Taurocholic acid	Bilirubin	HMDB0000036	HMDB0000054	taurocholate	bilirubin (z,z)
+295	52	Isoursodeoxycholic acid	Bilirubin	HMDB0000686	HMDB0000054	isoursodeoxycholate	bilirubin (z,z)
+296	53	Isoursodeoxycholic acid	Bilirubin	HMDB0000686	HMDB0000054	isoursodeoxycholate	bilirubin (z,z)
+297	54	Glycocholic acid	Isoursodeoxycholic acid	HMDB0000138	HMDB0000686	glycohyocholate	isoursodeoxycholate
+298	55	Taurocholic acid	Isoursodeoxycholic acid	HMDB0000036	HMDB0000686	taurocholate	isoursodeoxycholate
+299	56	Bilirubin	Isoursodeoxycholic acid	HMDB0000054	HMDB0000686	bilirubin (z,z)	isoursodeoxycholate
+300	57	Bilirubin	Isoursodeoxycholic acid	HMDB0000054	HMDB0000686	bilirubin (z,z)	isoursodeoxycholate
+301	58	Taurocholic acid	Glycocholic acid	HMDB0000036	HMDB0000138	taurocholate	glycohyocholate
+302	59	Taurocholic acid	Glycocholic acid	HMDB0000036	HMDB0000138	taurocholate	glycohyocholate
+303	60	Bilirubin	Glycocholic acid	HMDB0000054	HMDB0000138	bilirubin (z,z)	glycohyocholate
+304	61	Isoursodeoxycholic acid	Glycocholic acid	HMDB0000686	HMDB0000138	isoursodeoxycholate	glycohyocholate
+305	36	1-(9Z-octadecenoyl)-sn-glycerol	Phosphate	HMDB0011567	HMDB0001429	1-oleoylglycerol (1-monoolein)	phosphate

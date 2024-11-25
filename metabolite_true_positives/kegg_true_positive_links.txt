@@ -1,0 +1,197 @@
+	substrate	product	reaction_id	type	pwy	product_hmdb_id	substrate_hmdb_id	substrate_name	product_name
+0	C00116	C00093	R00847	irreversible	hsa00561	HMDB0000126	HMDB0000131	glycerol	glycerol 3-phosphate
+1	C00250	C00847	R01709	irreversible	hsa00750	HMDB0000017	HMDB0001545	pyridoxal	pyridoxate
+2	C00062	C00327	R00557	reversible	hsa00220	HMDB0000904	HMDB0000517	arginine	citrulline
+3	C00327	C00062	R00557	reversible	hsa00220	HMDB0000517	HMDB0000904	citrulline	arginine
+4	C00437	C00077	R00669	irreversible	hsa00220	HMDB0000214	HMDB0003357	n-acetylornithine	ornithine
+5	C00062	C00086	R00551	irreversible	hsa00220	HMDB0000294	HMDB0000517	arginine	urea
+6	C00062	C00077	R00551	irreversible	hsa00220	HMDB0000214	HMDB0000517	arginine	ornithine
+7	C00077	C00327	R01398	irreversible	hsa00220	HMDB0000904	HMDB0000214	ornithine	citrulline
+8	C00794	C00095	R00875	reversible	hsa00051	HMDB0000660	HMDB0000247,HMDB0000765	mannitol/sorbitol	fructose
+9	C00095	C00794	R00875	reversible	hsa00051	HMDB0000247,HMDB0000765	HMDB0000660	fructose	mannitol/sorbitol
+10	C00166	C00079	R00694	reversible	hsa00400	HMDB0000159	HMDB0000205	phenylpyruvate	phenylalanine
+11	C00079	C00166	R00694	reversible	hsa00400	HMDB0000205	HMDB0000159	phenylalanine	phenylpyruvate
+12	C00079	C00166	R00689	irreversible	hsa00400	HMDB0000205	HMDB0000159	phenylalanine	phenylpyruvate
+13	C00079	C00082	R01795	irreversible	hsa00400	HMDB0000158	HMDB0000159	phenylalanine	tyrosine
+14	C00082	C01179	R00729	irreversible	hsa00400	HMDB0000707	HMDB0000158	tyrosine	4-hydroxyphenylpyruvate
+15	C00082	C01179	R00734	reversible	hsa00400	HMDB0000707	HMDB0000158	tyrosine	4-hydroxyphenylpyruvate
+16	C01179	C00082	R00734	reversible	hsa00400	HMDB0000158	HMDB0000707	4-hydroxyphenylpyruvate	tyrosine
+17	C00166	C00079	R00694	reversible	hsa00400	HMDB0000159	HMDB0000205	phenylpyruvate	phenylalanine
+18	C00079	C00166	R00694	reversible	hsa00400	HMDB0000205	HMDB0000159	phenylalanine	phenylpyruvate
+19	C00082	C01179	R00734	reversible	hsa00400	HMDB0000707	HMDB0000158	tyrosine	4-hydroxyphenylpyruvate
+20	C01179	C00082	R00734	reversible	hsa00400	HMDB0000158	HMDB0000707	4-hydroxyphenylpyruvate	tyrosine
+21	C00135	C00785	R01168	irreversible	hsa00340	HMDB0000301	HMDB0000177	histidine	trans-urocanate
+22	C13747	C16358	R07943	irreversible	hsa00232	HMDB0010738	HMDB0001860	paraxanthine	1-methylxanthine
+23	C16358	C16359	R07942	irreversible	hsa00232	HMDB0003099	HMDB0010738	1-methylxanthine	1-methylurate
+24	C07480	C16360	R07978	irreversible	hsa00232	HMDB0001982	HMDB0002825	theobromine	3,7-dimethylurate
+25	C13747	C16356	R07945	irreversible	hsa00232	HMDB0011103	HMDB0001860	paraxanthine	1,7-dimethylurate
+26	C13747	C16365	R07940	irreversible	hsa00232	HMDB0011105	HMDB0001860	paraxanthine	5-acetylamino-6-formylamino-3-methyluracil
+27	C07481	C13747	R07939	irreversible	hsa00232	HMDB0001860	HMDB0001847	caffeine	paraxanthine
+28	C13747	C16356	R07977	irreversible	hsa00232	HMDB0011103	HMDB0001860	paraxanthine	1,7-dimethylurate
+29	C13747	C16356	R07945	irreversible	hsa00232	HMDB0011103	HMDB0001860	paraxanthine	1,7-dimethylurate
+30	C00519	C00245	R12959	irreversible	hsa00430	HMDB0000251	HMDB0000965	hypotaurine	taurine
+31	C00245	C05122	R03720	irreversible	hsa00430	HMDB0000036	HMDB0000251	taurine	taurocholate
+32	C00153	C02918	R01269	irreversible	hsa00760	HMDB0000699	HMDB0001406	nicotinamide	1-methylnicotinamide
+33	C02918	C05842	R08408	irreversible	hsa00760	HMDB0004193	HMDB0000699	1-methylnicotinamide	n1-methyl-2-pyridone-5-carboxamide
+34	C00062	C00077	R00551	irreversible	hsa00330	HMDB0000214	HMDB0000517	arginine	ornithine
+35	C00062	C00581	R00565	reversible	hsa00330	HMDB0000128	HMDB0000517	arginine	guanidinoacetate
+36	C00581	C00062	R00565	reversible	hsa00330	HMDB0000517	HMDB0000128	guanidinoacetate	arginine
+37	C00581	C00300	R01883	irreversible	hsa00330	HMDB0000064	HMDB0000128	guanidinoacetate	creatine
+38	C01419	C00037	R00899	irreversible	hsa00480	HMDB0000123	HMDB0000078	cysteinylglycine	glycine
+39	C01419	C00097	R00899	irreversible	hsa00480	HMDB0000574	HMDB0000078	cysteinylglycine	cysteine
+40	C01419	C00037	R00899	irreversible	hsa00480	HMDB0000123	HMDB0000078	cysteinylglycine	glycine
+41	C01419	C00097	R00899	irreversible	hsa00480	HMDB0000574	HMDB0000078	cysteinylglycine	cysteine
+42	C00089	C00031	R00801	irreversible	hsa00500	HMDB0000122	HMDB0000258	sucrose	glucose
+43	C00089	C00095	R00801	irreversible	hsa00500	HMDB0000660	HMDB0000258	sucrose	fructose
+44	C00089	C00031	R00801	irreversible	hsa00500	HMDB0000122	HMDB0000258	sucrose	glucose
+45	C00089	C00095	R00801	irreversible	hsa00500	HMDB0000660	HMDB0000258	sucrose	fructose
+46	C00208	C00031	R00028	irreversible	hsa00500	HMDB0000122	HMDB0000163	maltose	glucose
+47	C00037	C05466	R08744	irreversible	hsa00120	HMDB0000637	HMDB0000123	glycine	glycochenodeoxycholate
+48	C00245	C05465	R08745	irreversible	hsa00120	HMDB0000951	HMDB0000251	taurine	taurochenodeoxycholate
+49	C00037	C01921	R03718	irreversible	hsa00120	HMDB0000138	HMDB0000123	glycine	glycohyocholate
+50	C00245	C05122	R03720	irreversible	hsa00120	HMDB0000036	HMDB0000251	taurine	taurocholate
+51	C00385	C00366	R02107	irreversible	hsa00230	HMDB0000289	HMDB0000292	xanthine	urate
+52	C00008	C00020	R00122	irreversible	hsa00230	HMDB0000045	HMDB0001341	adenosine 5'-diphosphate (adp)	adenosine 5'-monophosphate (amp)
+53	C00020	C00008	R00127	reversible	hsa00230	HMDB0001341	HMDB0000045	adenosine 5'-monophosphate (amp)	adenosine 5'-diphosphate (adp)
+54	C00008	C00020	R00127	reversible	hsa00230	HMDB0000045	HMDB0001341	adenosine 5'-diphosphate (adp)	adenosine 5'-monophosphate (amp)
+55	C00020	C00130	R00181	irreversible	hsa00230	HMDB0000175	HMDB0000045	adenosine 5'-monophosphate (amp)	inosine 5'-monophosphate (imp)
+56	C00020	C00212	R00183	irreversible	hsa00230	HMDB0000050	HMDB0000045	adenosine 5'-monophosphate (amp)	adenosine
+57	C00212	C00020	R00185	reversible	hsa00230	HMDB0000045	HMDB0000050	adenosine	adenosine 5'-monophosphate (amp)
+58	C00020	C00212	R00185	reversible	hsa00230	HMDB0000050	HMDB0000045	adenosine 5'-monophosphate (amp)	adenosine
+59	C00130	C00294	R01126	irreversible	hsa00230	HMDB0000195	HMDB0000175	inosine 5'-monophosphate (imp)	inosine
+60	C00212	C00294	R01560	irreversible	hsa00230	HMDB0000195	HMDB0000050	adenosine	inosine
+61	C00262	C00130	R01132	irreversible	hsa00230	HMDB0000175	HMDB0000157	hypoxanthine	inosine 5'-monophosphate (imp)
+62	C00262	C00385	R01769	irreversible	hsa00230	HMDB0000292	HMDB0000157	hypoxanthine	xanthine
+63	C00294	C00262	R01863	reversible	hsa00230	HMDB0000157	HMDB0000195	inosine	hypoxanthine
+64	C00262	C00294	R01863	reversible	hsa00230	HMDB0000195	HMDB0000157	hypoxanthine	inosine
+65	C00262	C00385	R01768	irreversible	hsa00230	HMDB0000292	HMDB0000157	hypoxanthine	xanthine
+66	C00385	C00366	R02103	irreversible	hsa00230	HMDB0000289	HMDB0000292	xanthine	urate
+67	C00020	C00008	R00333	reversible	hsa00230	HMDB0001341	HMDB0000045	adenosine 5'-monophosphate (amp)	adenosine 5'-diphosphate (adp)
+68	C00008	C00020	R00333	reversible	hsa00230	HMDB0000045	HMDB0001341	adenosine 5'-diphosphate (adp)	adenosine 5'-monophosphate (amp)
+69	C00183	C00141	R01214	reversible	hsa00280	HMDB0000019	HMDB0000883	valine	3-methyl-2-oxobutyrate
+70	C00141	C00183	R01214	reversible	hsa00280	HMDB0000883	HMDB0000019	3-methyl-2-oxobutyrate	valine
+71	C00123	C00233	R01090	reversible	hsa00280	HMDB0000695	HMDB0000687	leucine	4-methyl-2-oxopentanoate
+72	C00233	C00123	R01090	reversible	hsa00280	HMDB0000687	HMDB0000695	4-methyl-2-oxopentanoate	leucine
+73	C00079	C05332	R00699	irreversible	hsa00360	HMDB0012275	HMDB0000159	phenylalanine	phenylethylamine
+74	C00166	C05852	R01372	irreversible	hsa00360	HMDB0000669	HMDB0000205	phenylpyruvate	2-hydroxyphenylacetate
+75	C00166	C00079	R00694	reversible	hsa00360	HMDB0000159	HMDB0000205	phenylpyruvate	phenylalanine
+76	C00079	C00166	R00694	reversible	hsa00360	HMDB0000205	HMDB0000159	phenylalanine	phenylpyruvate
+77	C00166	C00079	R00694	reversible	hsa00360	HMDB0000159	HMDB0000205	phenylpyruvate	phenylalanine
+78	C00079	C00166	R00694	reversible	hsa00360	HMDB0000205	HMDB0000159	phenylalanine	phenylpyruvate
+79	C00079	C00166	R00689	irreversible	hsa00360	HMDB0000205	HMDB0000159	phenylalanine	phenylpyruvate
+80	C00079	C00082	R01795	irreversible	hsa00360	HMDB0000158	HMDB0000159	phenylalanine	tyrosine
+81	C01089	C00164	R01361	reversible	hsa00650	HMDB0000060	HMDB0000011	3-hydroxybutyrate (bhba)	acetoacetate
+82	C00164	C01089	R01361	reversible	hsa00650	HMDB0000011	HMDB0000060	acetoacetate	3-hydroxybutyrate (bhba)
+83	C00026	C02630	R03534	irreversible	hsa00650	HMDB0059655	HMDB0000208	alpha-ketoglutarate	2-hydroxyglutarate
+84	C02291	C00097	R01001	reversible	hsa00270	HMDB0000574	HMDB0000099	cystathionine	cysteine
+85	C00097	C02291	R01001	reversible	hsa00270	HMDB0000099	HMDB0000574	cysteine	cystathionine
+86	C02291	C00109	R01001	reversible	hsa00270	HMDB0000005	HMDB0000099	cystathionine	alpha-ketobutyrate
+87	C00109	C02291	R01001	reversible	hsa00270	HMDB0000099	HMDB0000005	alpha-ketobutyrate	cystathionine
+88	C00065	C02291	R01290	irreversible	hsa00270	HMDB0000099	HMDB0000187	serine	cystathionine
+89	C00097	C00022	R00782	reversible	hsa00270	HMDB0000243	HMDB0000574	cysteine	pyruvate
+90	C00022	C00097	R00782	reversible	hsa00270	HMDB0000574	HMDB0000243	pyruvate	cysteine
+91	C00097	C00022	R00782	reversible	hsa00270	HMDB0000243	HMDB0000574	cysteine	pyruvate
+92	C00022	C00097	R00782	reversible	hsa00270	HMDB0000574	HMDB0000243	pyruvate	cysteine
+93	C00109	C02356	R10992	reversible	hsa00270	HMDB0000452	HMDB0000005	alpha-ketobutyrate	2-aminobutyrate
+94	C02356	C00109	R10992	reversible	hsa00270	HMDB0000005	HMDB0000452	2-aminobutyrate	alpha-ketobutyrate
+95	C00109	C02356	R10991	reversible	hsa00270	HMDB0000452	HMDB0000005	alpha-ketobutyrate	2-aminobutyrate
+96	C02356	C00109	R10991	reversible	hsa00270	HMDB0000005	HMDB0000452	2-aminobutyrate	alpha-ketobutyrate
+97	C06124	C00319	R06521	irreversible	hsa00600	HMDB0000252	HMDB0000277	sphingosine 1-phosphate	sphingosine
+98	C01120	C00836	R06520	irreversible	hsa00600	HMDB0000269	HMDB0001383	sphinganine-1-phosphate	sphinganine
+99	C00550	C00195	R02541	irreversible	hsa00600	HMDB0004950	HMDB0001348	stearoyl sphingomyelin (d18:1/18:0)	n-stearoyl-sphingosine (d18:1/18:0)*
+100	C00319	C00195	R01496	irreversible	hsa00600	HMDB0004950	HMDB0000252	sphingosine	n-stearoyl-sphingosine (d18:1/18:0)*
+101	C06124	C00319	R06521	irreversible	hsa00600	HMDB0000252	HMDB0000277	sphingosine 1-phosphate	sphingosine
+102	C01120	C00836	R06520	irreversible	hsa00600	HMDB0000269	HMDB0001383	sphinganine-1-phosphate	sphinganine
+103	C00195	C00319	R01494	irreversible	hsa00600	HMDB0000252	HMDB0004950	n-stearoyl-sphingosine (d18:1/18:0)*	sphingosine
+104	C00319	C06124	R01926	irreversible	hsa00600	HMDB0000277	HMDB0000252	sphingosine	sphingosine 1-phosphate
+105	C00836	C01120	R02976	irreversible	hsa00600	HMDB0001383	HMDB0000269	sphinganine	sphinganine-1-phosphate
+106	C06124	C00346	R06516	irreversible	hsa00600	HMDB0000224	HMDB0000277	sphingosine 1-phosphate	phosphoethanolamine
+107	C01120	C00346	R02464	irreversible	hsa00600	HMDB0000224	HMDB0001383	sphinganine-1-phosphate	phosphoethanolamine
+108	C00195	C00550	R08969	reversible	hsa00600	HMDB0001348	HMDB0004950	n-stearoyl-sphingosine (d18:1/18:0)*	stearoyl sphingomyelin (d18:1/18:0)
+109	C00550	C00195	R08969	reversible	hsa00600	HMDB0004950	HMDB0001348	stearoyl sphingomyelin (d18:1/18:0)	n-stearoyl-sphingosine (d18:1/18:0)*
+110	C00049	C00099	R00489	irreversible	hsa00410	HMDB0000056	HMDB0000191	aspartate	beta-alanine
+111	C00049	C00099	R00489	irreversible	hsa00410	HMDB0000056	HMDB0000191	aspartate	beta-alanine
+112	C02642	C00099	R00905	reversible	hsa00410	HMDB0000056	HMDB0000026	3-ureidopropionate	beta-alanine
+113	C00099	C02642	R00905	reversible	hsa00410	HMDB0000026	HMDB0000056	beta-alanine	3-ureidopropionate
+114	C00082	C01179	R00734	irreversible	hsa00130	HMDB0000707	HMDB0000158	tyrosine	4-hydroxyphenylpyruvate
+115	C00350	C02737	R07376	irreversible	hsa00564	HMDB0010163	HMDB0005779	1-(1-enyl-stearoyl)-2-arachidonoyl-gpe (p-18:0/20:4)*	1-stearoyl-2-oleoyl-gps (18:0/18:1)
+116	C00114	C00588	R01021	irreversible	hsa00564	HMDB0001565	HMDB0000097	choline	choline phosphate
+117	C00670	C00093	R01030	irreversible	hsa00564	HMDB0000126	HMDB0000086	glycerophosphorylcholine (gpc)	glycerol 3-phosphate
+118	C00670	C00114	R01030	irreversible	hsa00564	HMDB0000097	HMDB0000086	glycerophosphorylcholine (gpc)	choline
+119	C02737	C00350	R02055	irreversible	hsa00564	HMDB0005779	HMDB0010163	1-stearoyl-2-oleoyl-gps (18:0/18:1)	1-(1-enyl-stearoyl)-2-arachidonoyl-gpe (p-18:0/20:4)*
+120	C00588	C00114	R06871	irreversible	hsa00564	HMDB0000097	HMDB0001565	choline phosphate	choline
+121	C01233	C00093	R01470	irreversible	hsa00564	HMDB0000126	HMDB0000114	glycerophosphoethanolamine	glycerol 3-phosphate
+122	C04230	C00670	R02746	irreversible	hsa00564	HMDB0000086	HMDB0012108	1-heptadecanoylglycerophosphocholine	glycerophosphorylcholine (gpc)
+123	C01177	C00137	R01185	irreversible	hsa00562	HMDB0000211	HMDB0000213	inositol 1-phosphate (i1p)	myo-inositol
+124	C00065	C00037	R00588	reversible	hsa00260	HMDB0000123	HMDB0000187	serine	glycine
+125	C00037	C00065	R00588	reversible	hsa00260	HMDB0000187	HMDB0000123	glycine	serine
+126	C00581	C00300	R01883	irreversible	hsa00260	HMDB0000064	HMDB0000128	guanidinoacetate	creatine
+127	C00065	C02291	R01290	irreversible	hsa00260	HMDB0000099	HMDB0000187	serine	cystathionine
+128	C02291	C00097	R01001	reversible	hsa00260	HMDB0000574	HMDB0000099	cystathionine	cysteine
+129	C00097	C02291	R01001	reversible	hsa00260	HMDB0000099	HMDB0000574	cysteine	cystathionine
+130	C00037	C00581	R00565	irreversible	hsa00260	HMDB0000128	HMDB0000123	glycine	guanidinoacetate
+131	C00213	C00037	R00610	irreversible	hsa00260	HMDB0000123	HMDB0000271	sarcosine	glycine
+132	C00213	C00037	R00611	irreversible	hsa00260	HMDB0000123	HMDB0000271	sarcosine	glycine
+133	C00037	C00065	R00945	reversible	hsa00260	HMDB0000187	HMDB0000123	glycine	serine
+134	C00065	C00037	R00945	reversible	hsa00260	HMDB0000123	HMDB0000187	serine	glycine
+135	C00188	C00109	R00996	irreversible	hsa00260	HMDB0000005	HMDB0000167	threonine	alpha-ketobutyrate
+136	C00065	C00022	R00220	irreversible	hsa00260	HMDB0000243	HMDB0000187	serine	pyruvate
+137	C00037	C00213	R00367	reversible	hsa00260	HMDB0000271	HMDB0000123	glycine	sarcosine
+138	C00213	C00037	R00367	reversible	hsa00260	HMDB0000123	HMDB0000271	sarcosine	glycine
+139	C00065	C00022	R00220	irreversible	hsa00260	HMDB0000243	HMDB0000187	serine	pyruvate
+140	C00065	C00097	R00891	irreversible	hsa00260	HMDB0000574	HMDB0000187	serine	cysteine
+141	C06427	C16300	R07861	irreversible	hsa00592	HMDB0006547	HMDB0003073,HMDB0001388	linolenate [alpha or gamma; (18:3n3 or 6)]	stearidonate (18:4n3)
+142	C01127	C00022	R00470	reversible	hsa00630	HMDB0000243	HMDB0002070	4-hydroxy-2-oxoglutaric acid	pyruvate
+143	C00022	C01127	R00470	reversible	hsa00630	HMDB0002070	HMDB0000243	pyruvate	4-hydroxy-2-oxoglutaric acid
+144	C00065	C00037	R00588	irreversible	hsa00630	HMDB0000123	HMDB0000187	serine	glycine
+145	C00037	C00065	R00945	irreversible	hsa00630	HMDB0000187	HMDB0000123	glycine	serine
+146	C02642	C00099	R00905	irreversible	hsa00770	HMDB0000056	HMDB0000026	3-ureidopropionate	beta-alanine
+147	C00183	C00141	R01214	reversible	hsa00770	HMDB0000019	HMDB0000883	valine	3-methyl-2-oxobutyrate
+148	C00141	C00183	R01214	reversible	hsa00770	HMDB0000883	HMDB0000019	3-methyl-2-oxobutyrate	valine
+149	C00049	C00099	R00489	irreversible	hsa00770	HMDB0000056	HMDB0000191	aspartate	beta-alanine
+150	C05984	C00109	R01000	reversible	hsa00640	HMDB0000005	HMDB0000008	2-hydroxybutyrate (ahb)	alpha-ketobutyrate
+151	C00109	C05984	R01000	reversible	hsa00640	HMDB0000008	HMDB0000005	alpha-ketobutyrate	2-hydroxybutyrate (ahb)
+152	C00188	C00109	R00996	irreversible	hsa00290	HMDB0000005	HMDB0000167	threonine	alpha-ketobutyrate
+153	C00123	C00233	R01090	reversible	hsa00290	HMDB0000695	HMDB0000687	leucine	4-methyl-2-oxopentanoate
+154	C00233	C00123	R01090	reversible	hsa00290	HMDB0000687	HMDB0000695	4-methyl-2-oxopentanoate	leucine
+155	C00141	C00183	R01214	irreversible	hsa00290	HMDB0000883	HMDB0000019	3-methyl-2-oxobutyrate	valine
+156	C00186	C00022	R00703	reversible	hsa00620	HMDB0000243	HMDB0000190	lactate	pyruvate
+157	C00022	C00186	R00703	reversible	hsa00620	HMDB0000190	HMDB0000243	pyruvate	lactate
+158	C00227	C00033	R00317	irreversible	hsa00620	HMDB0000042	HMDB0001494	acetylphosphate	acetate
+159	C00735	C00762	R02836	irreversible	hsa00140	HMDB0002802	HMDB0000063	cortisol	cortisone
+160	C00735	C00762	R02834	irreversible	hsa00140	HMDB0002802	HMDB0000063	cortisol	cortisone
+161	C00032	C00500	R00311	reversible	hsa00860	HMDB0001008	HMDB0003178	heme	biliverdin
+162	C00500	C00032	R00311	reversible	hsa00860	HMDB0003178	HMDB0001008	biliverdin	heme
+163	C00500	C00486	R02391 R02393	irreversible	hsa00860	HMDB0000054	HMDB0001008	biliverdin	bilirubin (z,z)
+164	C00089	C00095	R00801	irreversible	hsa00052	HMDB0000660	HMDB0000258	sucrose	fructose
+165	C00089	C00031	R00801	irreversible	hsa00052	HMDB0000122	HMDB0000258	sucrose	glucose
+166	C00089	C00095	R00801	irreversible	hsa00052	HMDB0000660	HMDB0000258	sucrose	fructose
+167	C00089	C00031	R00801	irreversible	hsa00052	HMDB0000122	HMDB0000258	sucrose	glucose
+168	C01042	C00049	R00488	irreversible	hsa00250	HMDB0000191	HMDB0000812	n-acetylaspartate (naa)	aspartate
+169	C00049	C00152	R00578	reversible	hsa00250	HMDB0000168	HMDB0000191	aspartate	asparagine
+170	C00152	C00049	R00578	reversible	hsa00250	HMDB0000191	HMDB0000168	asparagine	aspartate
+171	C00152	C00049	R00485	irreversible	hsa00250	HMDB0000191	HMDB0000168	asparagine	aspartate
+172	C00049	C01042	R00487	irreversible	hsa00250	HMDB0000812	HMDB0000191	aspartate	n-acetylaspartate (naa)
+173	C00041	C00022	R00369	irreversible	hsa00250	HMDB0000243	HMDB0000161	alanine	pyruvate
+174	C00041	C00022	R00258	reversible	hsa00250	HMDB0000243	HMDB0000161	alanine	pyruvate
+175	C00022	C00041	R00258	reversible	hsa00250	HMDB0000161	HMDB0000243	pyruvate	alanine
+176	C00940	C00026	R00269	irreversible	hsa00250	HMDB0000208	HMDB0001552	alpha-ketoglutaramate*	alpha-ketoglutarate
+177	C01042	C12270	R10678	irreversible	hsa00250	HMDB0001067	HMDB0000812	n-acetylaspartate (naa)	n-acetyl-aspartyl-glutamate (naag)
+178	C12270	C01042	R10687	irreversible	hsa00250	HMDB0000812	HMDB0001067	n-acetyl-aspartyl-glutamate (naag)	n-acetylaspartate (naa)
+179	C00158	C20775	R10677	irreversible	hsa00250	HMDB0241915	HMDB0000094	citrate	beta-citrylglutamate
+180	C01042	C12270	R10678	irreversible	hsa00250	HMDB0001067	HMDB0000812	n-acetylaspartate (naa)	n-acetyl-aspartyl-glutamate (naag)
+181	C00186	C00022	R00703	reversible	hsa00010	HMDB0000243	HMDB0000190	lactate	pyruvate
+182	C00022	C00186	R00703	reversible	hsa00010	HMDB0000190	HMDB0000243	pyruvate	lactate
+183	C01103	C00295	R01870	reversible	hsa00240	HMDB0000226	HMDB0000788	orotidine	orotate
+184	C00295	C01103	R01870	reversible	hsa00240	HMDB0000788	HMDB0000226	orotate	orotidine
+185	C02642	C00099	R00905	irreversible	hsa00240	HMDB0000056	HMDB0000026	3-ureidopropionate	beta-alanine
+186	C00475	C00299	R01878	irreversible	hsa00240	HMDB0000296	HMDB0000089	cytidine	uridine
+187	C00337	C00295	R01868	reversible	hsa00240	HMDB0000226	HMDB03349	dihydroorotate	orotate
+188	C00295	C00337	R01868	reversible	hsa00240	HMDB03349	HMDB0000226	orotate	dihydroorotate
+189	C00082	C01179	R00734	reversible	hsa00350	HMDB0000707	HMDB0000158	tyrosine	4-hydroxyphenylpyruvate
+190	C01179	C00082	R00734	reversible	hsa00350	HMDB0000158	HMDB0000707	4-hydroxyphenylpyruvate	tyrosine
+191	C00082	C01179	R00729	irreversible	hsa00350	HMDB0000707	HMDB0000158	tyrosine	4-hydroxyphenylpyruvate
+192	C00082	C01179	R00734	reversible	hsa00350	HMDB0000707	HMDB0000158	tyrosine	4-hydroxyphenylpyruvate
+193	C01179	C00082	R00734	reversible	hsa00350	HMDB0000158	HMDB0000707	4-hydroxyphenylpyruvate	tyrosine
+194	C00328	C00108	R00987	irreversible	hsa00380	HMDB0001123	HMDB0000684	kynurenine	anthranilate
+195	C05653	C00108	R00988	irreversible	hsa00380	HMDB0001123	HMDB0004089	n-formylanthranilic acid	anthranilate
