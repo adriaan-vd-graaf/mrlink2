@@ -437,7 +437,7 @@ def mr_link2_loglik_reference_v0(th: np.ndarray, lam: np.ndarray,
 
     :param th:
         List or numpy array of floats with the parameters to optimize first is alpha, second the
-        1 /  exposure heritability and third the 1/ outcome heritability.
+        1 /  exposure heritability (per variant) and third the 1/ outcome heritability (per variant).
     :param lam:
         np.ndarray of selected eigenvalues of the cX and cY parameters.
     :param c_x:
@@ -501,7 +501,7 @@ def mr_link2_loglik_reference_v2(th: np.ndarray, lam: np.ndarray,
 
     :param th:
         List or numpy array of floats with the parameters to optimize first is alpha, second the
-        1 /  exposure heritability and third the 1/ outcome heritability.
+        1 /  exposure heritability (per variant)  and third the 1/ outcome heritability (per variant).
     :param lam:
         np.ndarray of selected eigenvalues of the cX and cY parameters.
     :param c_x:
@@ -559,8 +559,8 @@ def mr_link2_loglik_alpha_h0(th, lam, cX, cY, nX, nY) -> float:  # fix alpha to 
     Designed to be used in optimization algorithms like those in scipy.minimize
 
     :param th:
-        List or numpy array of floats with the 2 parameters to optimize first is alpha, second the exposure heritability
-        and third the outcome heritability.
+        List or numpy array of floats with the 2 parameters to optimize first is the
+        1 / exposure heritability (per variant) and third the 1 / outcome heritability (per variant).
     :param lam:
         np.ndarray of selected eigenvalues of the cX and cY parameters.
     :param cX:
@@ -586,8 +586,8 @@ def mr_link2_loglik_sigma_y_h0(th, lam, c_x, c_y, n_x, n_y) -> float:  # this is
     Designed to be used in optimization algorithms like those in scipy.minimize
 
     :param th:
-        List or numpy array of floats with the 2 parameters to optimize first is alpha, second the exposure heritability
-
+        List or numpy array of floats with the 2 parameters to optimize first is alpha, second the
+        1 / exposure heritability (per variant)
     :param lam:
         np.ndarray of selected eigenvalues of the cX and cY parameters.
     :param c_x:
