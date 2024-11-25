@@ -587,7 +587,7 @@ def mr_link2_loglik_sigma_y_h0(th, lam, c_x, c_y, n_x, n_y) -> float:  # this is
 
     :param th:
         List or numpy array of floats with the 2 parameters to optimize first is alpha, second the
-        1 / exposure heritability (per variant)
+        1 / exposure heritability (per variant).
     :param lam:
         np.ndarray of selected eigenvalues of the cX and cY parameters.
     :param c_x:
