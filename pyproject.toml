@@ -1,23 +1,67 @@
 [project]
 name = "mrlink_2"
-version = "0.0.1"
-description = "MR-link 2"
+version = "0.1.2"  # Update the version as needed
+description = "MR-link 2: Pleiotropy robust Mendelian Randomization "
 authors = [
   { name = "Adriaan van der Graaf" },
 ]
 license = { file = "LICENSE" }
 readme = "README.md"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "License :: Copyright Adriaan van der Graaf 2023",
-    "Operating System :: MacOS, Linux",
-]
 requires-python = ">=3.9"
+keywords = ["Mendelian Randomization", "genomics", "statistics", "Python"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Bio-Informatics",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+     "License :: Copyright Adriaan van der Graaf 2023",
+    "Operating System :: OS Independent",
+]
+
 dependencies = [
     "numpy",
     "scipy",
-    "pandas"
+    "pandas",
+    "pytest",
+    "bitarray",
+    "duckdb",
+    "pyarrow",
+    "rpy2"
 ]
 
-#[project.urls]
-"Homepage" = "https://github.com/adriaan-vd-graaf/mrlink2"
+[project.optional-dependencies]
+dev = [
+    "black",
+    "mypy",
+    "pytest",
+    "pytest-cov"
+]
+docs = [
+    "sphinx",
+    "sphinx-rtd-theme"
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests"
+]
+addopts = "--strict-markers"
+
+[tool.black]
+line-length = 88
+target-version = ['py39', 'py310', 'py311']
+
+[tool.mypy]
+files = "mrlink_2"
+strict = true
+
+[project.urls]
+Homepage = "https://github.com/adriaan-vd-graaf/mrlink2"
+Documentation = "https://github.com/adriaan-vd-graaf/mrlink2#readme"
