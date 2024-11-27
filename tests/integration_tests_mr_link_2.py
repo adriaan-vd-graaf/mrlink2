@@ -16,7 +16,7 @@ from mr_link_2_standalone import *
 def test_plink_version():
     result = subprocess.run(['plink', '--version'], capture_output=True, text=True)
     assert result.returncode == 0, "PLINK is not installed or not in the PATH"
-    assert 'PLINK v1.90' in result.stdout, "PLINK version is not 1.9"
+    assert 'PLINK v1.90' in result.stdout, "PLINK version is not literallly 'v1.90'"
 
 """
 I guess these are to ensure that no regressions happen 
