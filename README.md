@@ -138,7 +138,12 @@ options:
                         How many SNPs are allowed in the correlation matrix, as it can take a lot of time to 
                         do the eigendecompositions and Rscripts otherwise.
                         default: 5250
-
+  
+  --run_other_cis_mr_and_coloc
+                        This is a flag that you can add to run other MR analyses: MR-IVW, MR-IVW LD and MR-PCA,
+                        as well as coloc and SuSIE coloc. Requires R to be installed with the coloc and data.table 
+                        packages. Will append columns of these methods' results to the output file.
+                        
   --no_normalize_sumstats
                         flag to _not_ normalize summary statistics
   --no_exclude_hla      

@@ -1042,6 +1042,7 @@ def mr_link2_on_region(region: StartEndRegion,
                        var_explained_grid: list,
                        verbosity=0,
                        max_snp_threshold=5250,
+                       run_other_functions = False,
                        ) -> pd.DataFrame:
     """
 
@@ -1178,17 +1179,17 @@ def mr_link2_on_region(region: StartEndRegion,
     mafs = np.zeros_like(exp_betas)
     mafs[:] = 0.5
 
-
-    coloc_results = run_colocalization_analysis(exp_betas, out_betas, exp_pvals, out_pvals, n_exp, n_out, mafs,
-                                          correlation_mat, out_file = tmp_prepend + '_coloc_out',
-                                          in_file = tmp_prepend + '_coloc_in', ld_file = tmp_prepend + 'coloc_ld.bin')
-    instruments = np.zeros(exp_betas.shape[0], dtype=bool)
-    tmp_instruments = np.asarray(select_instruments_by_clumping(exp_pvals, correlation_mat, 5e-8, r_threshold=0.1), dtype=int)
-    for instrument in tmp_instruments:
-        instruments[instrument] = True
-    r_mr_results = run_external_mr_analysis(exp_betas, out_betas, exp_ses, out_ses,  exp_pvals, out_pvals, n_exp, n_out, mafs,
-                                          correlation_mat,instruments= instruments, out_file = tmp_prepend + '_mr_out',
-                                          in_file = tmp_prepend + '_mr_in', ld_file = tmp_prepend + 'mr_ld.bin')
+    if run_other_functions:
+        coloc_results = run_colocalization_analysis(exp_betas, out_betas, exp_pvals, out_pvals, n_exp, n_out, mafs,
+                                              correlation_mat, out_file = tmp_prepend + '_coloc_out',
+                                              in_file = tmp_prepend + '_coloc_in', ld_file = tmp_prepend + 'coloc_ld.bin')
+        instruments = np.zeros(exp_betas.shape[0], dtype=bool)
+        tmp_instruments = np.asarray(select_instruments_by_clumping(exp_pvals, correlation_mat, 5e-8, r_threshold=0.1), dtype=int)
+        for instrument in tmp_instruments:
+            instruments[instrument] = True
+        r_mr_results = run_external_mr_analysis(exp_betas, out_betas, exp_ses, out_ses,  exp_pvals, out_pvals, n_exp, n_out, mafs,
+                                              correlation_mat,instruments= instruments, out_file = tmp_prepend + '_mr_out',
+                                              in_file = tmp_prepend + '_mr_in', ld_file = tmp_prepend + 'mr_ld.bin')
 
     print('     Starting MR-link2')
 
@@ -1257,8 +1258,9 @@ def mr_link2_on_region(region: StartEndRegion,
 
         this_run['var_explained'] = var_explained
 
-        this_run = this_run.join(r_mr_results, rsuffix='')
-        this_run = this_run.join(coloc_results, rsuffix='')
+        if run_other_functions:
+            this_run = this_run.join(r_mr_results, rsuffix='')
+            this_run = this_run.join(coloc_results, rsuffix='')
 
         results_list.append(this_run)
 
@@ -1269,13 +1271,15 @@ def mr_link2_on_region(region: StartEndRegion,
 
 
     columns = ['region', 'var_explained', 'm_snps_overlap',
-                                   'alpha', 'se(alpha)', 'p(alpha)',
-                                   'sigma_y', 'se(sigma_y)', 'p(sigma_y)',
-                                   'sigma_x', 'function_time',
-                                   'beta_ivw', 'se_ivw', 'p_ivw',
-                                   'beta_ivw_r', 'se_ivw_r', 'p_ivw_r',
-                                   'beta_pca', 'se_pca', 'p_pca',
-                                   'PP.H1.abf', 'PP.H2.abf', 'PP.H3.abf', 'PP.H4.abf']
+               'alpha', 'se(alpha)', 'p(alpha)',
+               'sigma_y', 'se(sigma_y)', 'p(sigma_y)',
+               'sigma_x', 'function_time',]
+
+    if run_other_functions:
+        columns +=['beta_ivw', 'se_ivw', 'p_ivw',
+                   'beta_ivw_r', 'se_ivw_r', 'p_ivw_r',
+                   'beta_pca', 'se_pca', 'p_pca',
+                   'PP.H1.abf', 'PP.H2.abf', 'PP.H3.abf', 'PP.H4.abf']
 
     if 'susie_max_PP.H4.abf' in mr_results_df.columns:
         columns += ['susie_max_PP.H1.abf',
@@ -1600,6 +1604,15 @@ Pleiotropy robust cis Mendelian randomization
                              'Do the eigendecompositions and Rscripts otherwise.'
                         )
 
+    parser.add_argument('--run_other_cis_mr_and_coloc',
+                        required=False,
+                        action='store_true',
+                        help='By setting this flag, we will run other _cis_ MR functions as well as coloc and SuSIE '
+                             'coloc. Warning, can be slow '
+                        )
+
+
+
     parser.add_argument('--verbose',
                         default=0,
                         help='Set to 1 if you want to read more output, for debugging purposes ')
@@ -1865,7 +1878,9 @@ Pleiotropy robust cis Mendelian randomization
                                                               tmp_prepend=tmp_dir,
                                                               verbosity=verbosity,
                                                               var_explained_grid=var_explained_grid,
-                                                              max_snp_threshold=max_correlation_matrix_snps)
+                                                              max_snp_threshold=max_correlation_matrix_snps,
+                                                              run_other_functions=args.run_other_cis_mr_and_coloc,
+                                                              )
                     except Exception as x:
                         exceptions.append((region, x))
                         print(f'Unable to make an MR-link2 estimate in {region} due to {x}')
