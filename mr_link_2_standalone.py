@@ -844,7 +844,7 @@ def match_n_variants_n_individuals_from_plink_log(plink_logfile: str) -> Tuple[i
         Tuple containing the numbeer of variants and number of individuals
     """
 
-    regex = re.compile('^([0-9]+) variants and ([0-9]+) people pass filters and QC\.')
+    regex = re.compile('^([0-9]+) variants and ([0-9]+) people pass filters and QC')
     with open(plink_logfile) as f:
         for line in f:
             match_obj = regex.match(line)
