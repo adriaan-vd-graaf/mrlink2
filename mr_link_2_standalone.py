@@ -1291,7 +1291,7 @@ def mr_link2_on_region(region: StartEndRegion,
                     'susie_max_PP.H4.abf']
 
 
-    mr_results_df = mr_results_df[columns]
+    mr_results_df = mr_results_df[columns].rename({'n_instruments': 'n_instruments_for_classical_mr'}, axis=1)
 
     ## this is a normalization step that is done as the likelihood function computes them per SNP
     mr_results_df['sigma_x'] = mr_results_df['sigma_x'] * mr_results_df['m_snps_overlap']
