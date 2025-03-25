@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/688924886.svg)](https://doi.org/10.5281/zenodo.14961110)
 # MR-link-2
 
 MR-link-2 is a _cis_ MR method that is pleiotropy robust. 
