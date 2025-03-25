@@ -1279,7 +1279,7 @@ def mr_link2_on_region(region: StartEndRegion,
                'sigma_x', 'function_time',]
 
     if run_other_functions:
-        columns +=['beta_ivw', 'se_ivw', 'p_ivw',
+        columns +=['n_instruments', 'beta_ivw', 'se_ivw', 'p_ivw',
                    'beta_ivw_r', 'se_ivw_r', 'p_ivw_r',
                    'beta_pca', 'se_pca', 'p_pca',
                    'PP.H1.abf', 'PP.H2.abf', 'PP.H3.abf', 'PP.H4.abf']
