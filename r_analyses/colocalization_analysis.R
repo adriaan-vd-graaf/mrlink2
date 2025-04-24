@@ -27,7 +27,7 @@ for(simulation_idx in simulations){
 
   exp_varbeta <- (abs(exp_df$beta)/abs(qnorm(exp_df$p_values/2)))^2
   out_varbeta <- (abs(out_df$beta)/abs(qnorm(out_df$p_values/2)))^2
-  filter <- (exp_varbeta != 0) & (out_varbeta != 0)
+  filter <- is.finite(exp_varbeta) & exp_varbeta > 0 & is.finite(out_varbeta) & out_varbeta > 0
 
   exp_list <- list(beta=exp_df$beta[filter], varbeta=exp_varbeta[filter],
                    MAF=exp_df$MAF[filter], pvalues=exp_df$p_values[filter], N=exp_df$N[1], type="quant", LD=ld_mat,
