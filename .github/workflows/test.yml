@@ -65,16 +65,21 @@ jobs:
 
       - name: Run comparison_tests_with_r_imlementation
         env:
-          # Define LD_LIBRARY_PATH using the R_HOME env var
-          LD_LIBRARY_PATH: ${{ env.R_HOME }}/lib:${{ env.LD_LIBRARY_PATH }}
-        run: | # Use multi-line indicator
-          echo "--- Debug Info ---" # <-- DEBUG STEP 2
+          # Explicitly get R_HOME from the setup-r step's output
+          R_HOME_FROM_OUTPUT: ${{ steps.setup-r.outputs.r-home }}
+          # Construct the library path - assuming standard $R_HOME/lib structure first
+          R_LIB_DIR: ${{ steps.setup-r.outputs.r-home }}/lib
+          LD_LIBRARY_PATH: ${{ steps.setup-r.outputs.r-home }}/lib:${{ env.LD_LIBRARY_PATH }}
+          # Also explicitly set R_HOME env var for this step
+          R_HOME: ${{ steps.setup-r.outputs.r-home }}
+        run: |
+          echo "--- Debug Info ---"
           echo "Running test: test_for_r_and_python_concordance.py"
-          echo "R_HOME in test step: $R_HOME"
-          echo "LD_LIBRARY_PATH in test step: $LD_LIBRARY_PATH"
-          echo "Listing contents of $R_HOME/lib:"
-          ls -l "$R_HOME/lib" || echo "Failed to list $R_HOME/lib"
-          echo "Attempting to find libR.so system-wide:" # <-- DEBUG STEP 3
-          find / -name libR.so -type f 2>/dev/null || echo "libR.so not found by find"
+          echo "Value from steps.setup-r.outputs.r-home: ${{ steps.setup-r.outputs.r-home }}" # Verify output is read
+          echo "R_LIB_DIR calculated: $R_LIB_DIR" # Check constructed lib dir
+          echo "R_HOME in this step's env: $R_HOME" # Check R_HOME env var is now set
+          echo "LD_LIBRARY_PATH in test step: $LD_LIBRARY_PATH" # Check the full LD_LIBRARY_PATH
+          echo "Listing contents of R_LIB_DIR ($R_LIB_DIR):"
+          ls -l "$R_LIB_DIR" || echo "Failed to list $R_LIB_DIR" # See if libR.so is here
           echo "--- End Debug Info ---"
           pytest tests/test_for_r_and_python_concordance.py
