@@ -16,9 +16,16 @@ from rpy2.robjects.vectors import FloatVector, ListVector, StrVector
 from rpy2.robjects.packages import importr
 from rpy2.robjects.conversion import localconverter
 
+import pytest
+from rpy2.robjects.conversion import localconverter
+import rpy2.robjects as ro
 
-# Activate automatic conversion between numpy and R objects
-numpy2ri.activate()
+@pytest.fixture(autouse=True)
+def r_env_setup():
+    """Set up the rpy2 numpy conversion context for all tests in this module."""
+    with localconverter(ro.default_converter + numpy2ri.converter):
+        yield
+
 
 # Load the base R package
 base = importr('base')

@@ -1,5 +1,5 @@
 ####
-## Copyright 2025 Adriaan van der Graaf, MIT licence
+##  MIT licence
 ####
 import numpy as np
 import scipy.optimize
