@@ -12,7 +12,11 @@ If you have any questions or suggestions, feel free to open an issue.
 We appreciate everybody trying to use our software, so we try to come back to you as soon as possible!  
 
 If you use our paper, please cite us: 
-van der Graaf, A., Warmerdam, R., Auwerx, C. et al. MR-link-2: pleiotropy robust cis Mendelian randomization validated in three independent reference datasets of causality. Nat Commun 16, 6112 (2025). https://doi.org/10.1038/s41467-025-60868-1
+```
+van der Graaf, A., Warmerdam, R., Auwerx, C. et al.
+MR-link-2: pleiotropy robust cis Mendelian randomization validated in three independent reference datasets of causality.
+Nat Commun 16,x 6112 (2025). https://doi.org/10.1038/s41467-025-60868-1
+```
 
 
 ### Requirements
