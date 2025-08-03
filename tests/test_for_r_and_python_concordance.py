@@ -10,20 +10,17 @@ from mr_link_2_standalone import *
 
 ## for the R part
 
+import pytest
 from rpy2.robjects import r, numpy2ri, default_converter
-from rpy2.robjects.vectors import FloatVector, ListVector, StrVector
-
+from rpy2.robjects.vectors import FloatVector, StrVector
 from rpy2.robjects.packages import importr
 from rpy2.robjects.conversion import localconverter
 
-import pytest
-from rpy2.robjects.conversion import localconverter
-import rpy2.robjects as ro
 
 @pytest.fixture(autouse=True)
 def r_env_setup():
     """Set up the rpy2 numpy conversion context for all tests in this module."""
-    with localconverter(ro.default_converter + numpy2ri.converter):
+    with localconverter(default_converter + numpy2ri.converter):
         yield
 
 
