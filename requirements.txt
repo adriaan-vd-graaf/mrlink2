@@ -1,0 +1,16 @@
+numpy==2.3.2
+pandas==2.3.1
+pytest==8.3.3
+rpy2==3.6.2
+rpy2_rinterface==3.6.2
+rpy2_robjects==3.6.1
+scipy==1.16.1
+pyarrow==17.0.0
+pandas==2.2.3
+bitarray==3.0.0
+duckdb==1.1.2.dev87
+statsmodels==0.14.4
+zstandard==0.22.0
+
+
+

@@ -40,14 +40,13 @@ jobs:
             ${{ runner.os }}-pip-
 
       - name: Install Python dependencies
-        run: | # Use multi-line indicator
-          python -m pip install --upgrade pip
-          pip install numpy scipy pandas pytest bitarray duckdb pyarrow rpy2
+        run: pip install -r requirements.txt
 
-      # Step to install R packages (after system dependencies)
-      - name: Install R dependencies
-        run: | # Use multi-line indicator
-          Rscript -e 'install.packages(c("data.table", "coloc"), repos = "https://cloud.r-project.org/")'
+      - name: Install R dependencies with pak
+        run: |
+          install.packages("pak", repos = "https://cloud.r-project.org/")
+          pak::pkg_install(c("data.table", "coloc"))
+        shell: Rscript {0}
 
       - name: Download and install plink
         run: | # Use multi-line indicator
@@ -57,46 +56,5 @@ jobs:
           sudo mv plink/plink /usr/local/bin/
           rm -rf plink_linux_x86_64.zip plink
 
-      - name: Run unit tests
-        run: pytest tests/unit_tests_mr_link_2.py # Single line is okay, but | is safer
-
-      - name: Run integration tests
-        run: pytest tests/integration_tests_mr_link_2.py # Single line is okay, but | is safer
-      - name: Run comparison_tests_with_r_imlementation
-        # Removed the env: block as we'll set vars in the script
-        run: |
-          echo "--- Debug Info ---"
-          echo "Attempting to get R_HOME using 'R RHOME' command..."
-          # Execute 'R RHOME' and capture the output
-          R_HOME_DETECTED=$(R RHOME)
-
-          # Check if we got a path
-          if [[ -z "$R_HOME_DETECTED" ]]; then
-            echo "ERROR: 'R RHOME' command failed or returned empty output."
-            # Optionally, try the hardcoded path seen before as a fallback for debugging
-            echo "Attempting fallback hardcoded path..."
-            R_HOME_DETECTED="/opt/R/4.5.0"
-            if [[ ! -d "$R_HOME_DETECTED" ]]; then
-               echo "ERROR: Fallback path $R_HOME_DETECTED does not exist. Exiting."
-               exit 1
-            fi
-          fi
-
-          echo "Using R_HOME path: $R_HOME_DETECTED"
-
-          # Export R_HOME so pytest (and rpy2) can see it
-          export R_HOME="$R_HOME_DETECTED"
-
-          # Construct and export LD_LIBRARY_PATH using the detected R_HOME
-          # Assuming standard $R_HOME/lib structure
-          R_LIB_DIR="$R_HOME/lib"
-          export LD_LIBRARY_PATH="$R_LIB_DIR:${LD_LIBRARY_PATH}"
-
-          echo "R_HOME exported as: $R_HOME"
-          echo "LD_LIBRARY_PATH exported as: $LD_LIBRARY_PATH"
-          echo "Listing contents of R_LIB_DIR ($R_LIB_DIR):"
-          ls -l "$R_LIB_DIR" || echo "Failed to list $R_LIB_DIR"
-          echo "--- End Debug Info ---"
-
-          # Run pytest - it should inherit the exported variables
-          pytest tests/test_for_r_and_python_concordance.py
+      - name: Run all tests
+        run: pytest

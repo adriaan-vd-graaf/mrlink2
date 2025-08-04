@@ -23,6 +23,20 @@ def r_env_setup():
     with localconverter(default_converter + numpy2ri.converter):
         yield
 
+def r_named_list_to_py_dict(r_list):
+    """
+    Robustly convert an R named list to a Python dictionary,
+    handling API changes between rpy2 versions.
+    """
+    try:
+        # Method for rpy2 < 3.6 (works like a Python dict)
+        return {str(key): value[0] for key, value in r_list.items()}
+    except (TypeError, AttributeError):
+        # Method for rpy2 >= 3.6
+        # The object requires integer-based indexing. We get the list of
+        # names and use enumerate to get both the index (i) and name.
+        names = r_list.names()
+        return {name: r_list[i][0] for i, name in enumerate(names)}
 
 # Load the base R package
 base = importr('base')
@@ -411,7 +425,7 @@ def test_mr_link2_equivalence_fuzz(selected_eigenvalues, selected_eigenvectors, 
         )
 
     # Convert R result back to Python dictionary format
-    r_result_dict = {str(key): value[0] for key, value in r_result.items()}
+    r_result_dict = r_named_list_to_py_dict(r_result)
 
     optimization_indicators = ['optim_alpha_h0_success', 'optim_sigma_y_h0_success', 'optim_ha_success']
     for result in [python_result, r_result_dict]:
@@ -452,9 +466,14 @@ def test_remove_highly_correlated():
         # Call the R function `remove_highly_correlated`
         r_pruned_result = r['remove_highly_correlated'](r_ld_matrix, r_snp_ordering, max_correlation)
 
-    # Extract results from R output
-    pruned_ld_matrix = np.array(r_pruned_result['ld_matrix'])
-    pruned_snps = list(r_pruned_result['pruned_snps'])
+    # Extract results using integer indices
+    names = list(r_pruned_result.names())
+    idx_ld = names.index('ld_matrix')
+    idx_snps = names.index('pruned_snps')
+
+    pruned_ld_matrix = np.array(r_pruned_result[idx_ld])
+    pruned_snps = list(r_pruned_result[idx_snps])
+
 
     # Expected pruned results (SNP2 is removed)
     expected_pruned_ld_matrix = np.array([[1.0, 0.05], [0.05, 1.0]])
@@ -494,7 +513,7 @@ def test_mr_link2_analysis():
                                              r_max_correlation)
 
     # Convert the result back to a Python-friendly format
-    mr_result_dict = dict(r_mr_result)
+    mr_result_dict = r_named_list_to_py_dict(r_mr_result)
 
     # Check the output has expected keys and ranges
     assert 'alpha' in mr_result_dict, "Key 'alpha' missing in MR result."
