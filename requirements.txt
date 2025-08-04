@@ -8,7 +8,5 @@ pyarrow==17.0.0
 pandas==2.2.3
 bitarray==3.0.0
 duckdb==1.1.2
-statsmodels==0.14.4
-zstandard==0.22.0
 
 
