@@ -13,6 +13,7 @@ import subprocess
 import copy
 import scipy
 import scipy.io
+import warnings
 from typing import Any, Tuple, Dict
 import tempfile
 import bitarray
@@ -1033,6 +1034,30 @@ def run_external_mr_analysis(bXs, bYs, seXs, seYs, pXs, pYs, n_exp, n_out, mafs,
     return results
 
 
+def warn_if_only_gws_snps(exp_pvals: np.ndarray, region,
+                          gws_threshold: float = 5e-8,
+                          fraction_threshold: float = 1.0) -> None:
+    """
+    Emit a UserWarning when the exposure SNPs in a region are overwhelmingly genome-wide
+    significant, which is a sign that the user pre-filtered to only significant SNPs.
+
+    MR-link-2 needs *all* common SNPs in the region to estimate pleiotropy correctly.
+    Supplying only genome-wide significant SNPs causes the pleiotropy parameter (sigma_y)
+    to absorb the missing LD structure and can produce estimates well above 1.0.
+    """
+    fraction_gws = np.mean(exp_pvals < gws_threshold)
+    if fraction_gws >= fraction_threshold:
+        warnings.warn(
+            f'Region {region}: {fraction_gws:.0%} of exposure SNPs are genome-wide significant '
+            f'(p < {gws_threshold:.0e}). MR-link-2 is designed to use all common SNPs in a region, '
+            f'not only the significant ones. Supplying only genome-wide significant SNPs inflates the '
+            f'pleiotropy estimate (sigma_y) and may produce values well above 1.0. '
+            f'Please rerun including all SNPs with MAF > 0.01 in the region.',
+            UserWarning,
+            stacklevel=3,
+        )
+
+
 def mr_link2_on_region(region: StartEndRegion,
                        exposure_df: pd.DataFrame,
                        outcome_df: pd.DataFrame,
@@ -1163,6 +1188,7 @@ def mr_link2_on_region(region: StartEndRegion,
     out_pvals = np.asarray([out_dict[x][3] for x in ordered_snps], dtype=float)
     out_ses = np.asarray([out_dict[x][4] for x in ordered_snps], dtype=float)
 
+    warn_if_only_gws_snps(exp_pvals, region)
 
     """
     Now, the optimization

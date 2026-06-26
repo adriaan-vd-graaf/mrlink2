@@ -312,5 +312,54 @@ def test_mr_link2_loglik_alpha_h0_large_population():
     assert result == mr_link2_loglik_reference_v2([0.0] + list(th), lam, cX, cY, nX, nY)
 
 
+"""
+Tests for warn_if_only_gws_snps
+"""
+
+def test_warn_if_only_gws_snps_all_significant():
+    """All SNPs genome-wide significant → UserWarning (default threshold=1.0)."""
+    region = StartEndRegion('1', 1000, 2000)
+    all_gws = np.array([1e-10, 1e-9, 1e-15, 1e-20, 4e-8])
+    with pytest.warns(UserWarning, match='genome-wide significant'):
+        warn_if_only_gws_snps(all_gws, region)
+
+
+def test_warn_if_only_gws_snps_no_warning_when_any_non_significant():
+    """One non-GWS SNP in the mix → no warning."""
+    import warnings as _warnings
+    region = StartEndRegion('1', 1000, 2000)
+    mostly_gws = np.array([1e-10, 1e-9, 1e-12, 0.3])  # 3/4 GWS, not all
+    with _warnings.catch_warnings():
+        _warnings.simplefilter('error')
+        warn_if_only_gws_snps(mostly_gws, region)  # must not raise
+
+
+def test_warn_if_only_gws_snps_no_warning_when_none_significant():
+    """No GWS SNPs → no warning."""
+    import warnings as _warnings
+    region = StartEndRegion('1', 1000, 2000)
+    none_gws = np.array([0.1, 0.3, 0.5, 0.7])
+    with _warnings.catch_warnings():
+        _warnings.simplefilter('error')
+        warn_if_only_gws_snps(none_gws, region)
+
+
+def test_warn_if_only_gws_snps_custom_fraction_threshold():
+    """Custom fraction_threshold is respected: warn when >= threshold."""
+    region = StartEndRegion('1', 1000, 2000)
+    # 60% GWS — below default 1.0 but above custom 0.5
+    pvals = np.array([1e-10, 1e-9, 1e-12, 0.3, 0.5])  # 3/5 = 60%
+    with pytest.warns(UserWarning, match='genome-wide significant'):
+        warn_if_only_gws_snps(pvals, region, fraction_threshold=0.5)
+
+
+def test_warn_if_only_gws_snps_message_contains_region():
+    """Warning message includes the region identifier."""
+    region = StartEndRegion('7', 100000, 200000)
+    all_gws = np.array([1e-10, 1e-9, 1e-12])
+    with pytest.warns(UserWarning, match='7:100000-200000'):
+        warn_if_only_gws_snps(all_gws, region)
+
+
 
 
